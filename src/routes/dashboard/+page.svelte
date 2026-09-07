@@ -167,10 +167,10 @@
         <div class="hero-grid">
           <div class="hero-text">
             <p class="hero-eyebrow">MailFlare Infrastructure</p>
-            <h2 class="hero-title">{greeting}, MAS</h2>
+            <h2 class="hero-title">{greeting}, Admin</h2>
             <p class="hero-sub">
-              Ringkasan operasional mailbox, user, dan worker. Data terakhir disinkron
-              <strong>{generatedAtLabel}</strong>.
+              Ringkasan operasional mailbox, user, dan worker. <br>
+              Data terakhir disinkron <strong>{generatedAtLabel}</strong>.
             </p>
           </div>
           <div class="hero-actions">

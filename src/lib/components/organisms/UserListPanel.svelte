@@ -619,6 +619,7 @@
 
   .input-shell {
     position: relative;
+    margin: 4px 0;
   }
 
   .input-icon {
@@ -633,7 +634,7 @@
   .input-shell :global(.input) {
     border: 0;
     border-radius: 0.75rem;
-    background: color-mix(in srgb, var(--color-surface-low), white 35%);
+    background: var(--color-surface-low);
     padding-top: 0.9rem;
     padding-bottom: 0.9rem;
     padding-right: 2.5rem;
@@ -669,6 +670,7 @@
 
   .btn-submit {
     border: 0;
+    background: var(--gradient-signature);
     color: #fff;
     font-family: var(--font-family-headline);
     font-weight: 800;
@@ -676,7 +678,6 @@
     border-radius: 0.75rem;
     padding: 0.75rem 2rem;
     cursor: pointer;
-    box-shadow: 0 10px 24px rgba(0, 81, 255, 0.2);
   }
 
   .btn-submit:disabled,

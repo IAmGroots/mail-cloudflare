@@ -125,6 +125,12 @@
     min-height: 2.75rem;
   }
 
+  .left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+  }
   .left h1 {
     font-size: 1rem;
     margin-top: 0.2rem;
@@ -202,7 +208,7 @@
     .topbar {
       flex-wrap: wrap;
       align-items: flex-start;
-      gap: var(--space-3);
+      gap: var(--space-1);
       padding: 0.75rem 0.9rem;
     }
 

@@ -20,6 +20,7 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    cursor: pointer;
   }
 
   .logo {
