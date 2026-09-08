@@ -90,9 +90,10 @@
       const payload = (await response.json().catch(() => null)) as
         | {
             error?: string;
-            credentials?: {
-              username: string;
+            user?: {
+              id: string;
               email: string;
+              displayName: string;
               password: string;
             };
           }
@@ -102,12 +103,16 @@
         return;
       }
 
-      if (!payload?.credentials) {
+      if (!payload?.user?.password) {
         errorMessage = 'Create user succeeded but credentials payload is missing.';
         return;
       }
 
-      generatedCredentials = payload.credentials;
+      generatedCredentials = {
+        username: payload.user.displayName,
+        email: payload.user.email,
+        password: payload.user.password
+      };
       credentialContext = 'create';
       username = '';
       dispatch('usercreated');
@@ -169,6 +174,7 @@
         email: user.email,
         password: payload.password
       };
+
       copyMessage = '';
       credentialContext = 'reset';
       modalOpen = true;
@@ -230,6 +236,7 @@
       Add User
     </Button>
   </div>
+
   {#if listMessage}
     <p class="text-muted list-feedback">{listMessage}</p>
   {/if}
@@ -352,7 +359,7 @@
               <Icon name="warning" size={18} />
             </div>
             <p>
-              <strong>Make sure to save this password securely.</strong> It will not be shown again for security reasons.
+              <strong>Make sure to save this password securely.</strong> <br>It will not be shown again for security reasons.
             </p>
           </div>
 
@@ -414,7 +421,7 @@
 
   .list {
     display: grid;
-    gap: 0.55rem;
+    gap: 0.50rem;
   }
 
   .row {
@@ -469,7 +476,7 @@
     width: 1.9rem;
     height: 1.9rem;
     border-radius: 0.5rem;
-    border: 1px solid color-mix(in srgb, var(--color-outline), transparent 55%);
+    border: 1px solid color-mix(in srgb, var(--color-outline), transparent 50%);
     background: color-mix(in srgb, var(--color-surface-low), white 25%);
     color: var(--color-text-muted);
     display: inline-flex;
@@ -480,12 +487,12 @@
 
   .icon-action:hover {
     color: var(--color-primary-500);
-    border-color: color-mix(in srgb, var(--color-primary-500), transparent 55%);
+    border-color: color-mix(in srgb, var(--color-primary-500), transparent 50%);
   }
 
   .icon-action.danger:hover {
-    color: #bf273f;
-    border-color: color-mix(in srgb, #bf273f, transparent 55%);
+    color: var(--color-warning);
+    border-color: color-mix(in srgb, var(--color-warning), transparent 50%);
   }
 
   .icon-action:disabled {
@@ -553,7 +560,7 @@
   }
 
   h3 {
-    font-size: 1.55rem;
+    font-size: 1.50rem;
     margin-bottom: 0.3rem;
     letter-spacing: -0.02em;
   }
@@ -649,7 +656,7 @@
     justify-content: flex-end;
     align-items: center;
     gap: var(--space-3);
-    padding: 0 var(--space-8) var(--space-8);
+    margin-bottom: var(--space-3);
   }
 
   .btn-cancel {
@@ -682,7 +689,7 @@
 
   .btn-submit:disabled,
   .btn-cancel:disabled {
-    opacity: 0.55;
+    opacity: 0.50;
     cursor: not-allowed;
   }
 
@@ -723,14 +730,14 @@
   code {
     font-size: 0.85rem;
     font-family: 'Consolas', 'Courier New', monospace;
-    color: var(--color-primary-500);
+    color: var(--color-text);
     overflow-wrap: anywhere;
   }
 
   .copy-btn {
     border: 0;
     background: transparent;
-    color: var(--color-primary-500);
+    color: var(--color-text);
     border-radius: 0.5rem;
     width: 2rem;
     height: 2rem;
@@ -741,16 +748,16 @@
   }
 
   .copy-btn:hover {
-    background: color-mix(in srgb, var(--color-primary-500), white 88%);
+    background: var(--color-primary-500);
   }
 
   .warning-box {
     margin-top: var(--space-2);
     border-radius: var(--radius-md);
     padding: var(--space-3);
-    background: color-mix(in srgb, var(--color-warning), white 88%);
+    background: color-mix(in srgb, var(--color-text) 5%, transparent);
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--space-3);
   }
 
@@ -758,12 +765,11 @@
     margin: 0;
     font-size: 0.82rem;
     line-height: 1.45;
-    color: color-mix(in srgb, var(--color-warning), #402000 30%);
+    color: var(--color-warning);
   }
 
   .warning-icon {
     color: var(--color-warning);
-    margin-top: 0.1rem;
   }
 
   .copy-feedback {

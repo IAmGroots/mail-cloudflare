@@ -145,9 +145,11 @@ $: visibleEmails = (
   .mailbox-card {
     border-radius: var(--radius-lg);
     overflow: hidden;
+    padding: 0;
   }
 
   .mailbox-filter {
+
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -156,6 +158,7 @@ $: visibleEmails = (
     padding: var(--space-3) var(--space-4);
     border-bottom: 1px solid color-mix(in srgb, var(--color-outline), transparent 72%);
     background: color-mix(in srgb, var(--color-surface-low), transparent 12%);
+    border-radius: var(--radius-md);
   }
 
   .tabs {

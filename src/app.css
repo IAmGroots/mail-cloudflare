@@ -7,8 +7,8 @@
   --color-text: #191c1e;
   --color-text-muted: #434656;
   --color-outline: #c3c5d9;
-  --color-danger: #ba1a1a;
-  --color-warning: #952200;
+  --color-danger: #a00000;
+  --color-warning: #f31a1a;
   --color-success: #1a7f37;
 
   --space-1: 0.25rem;
@@ -50,8 +50,8 @@
   --color-text: #ededef;
   --color-text-muted: #b0b3be;
   --color-outline: #3a3d4a;
-  --color-danger: #ffb4ab;
-  --color-warning: #ffb4a0;
+  --color-danger: #a00000;
+  --color-warning: #f31a1a;
   --color-success: #7cd590;
   
   --shadow-ambient: 0 20px 48px rgba(0, 0, 0, 0.4);

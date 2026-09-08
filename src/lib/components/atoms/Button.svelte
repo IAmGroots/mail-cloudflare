@@ -30,10 +30,6 @@
     transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease;
   }
 
-  .btn:hover {
-    opacity: 0.95;
-  }
-
   .btn:active {
     transform: scale(0.98);
   }
@@ -50,7 +46,6 @@
   .btn-primary {
     color: #ffffff;
     background: var(--gradient-signature);
-    box-shadow: 0 4px 12px rgba(0, 81, 255, 0.2);
   }
 
   .btn-secondary {
@@ -58,9 +53,19 @@
     background: var(--color-surface-low);
   }
 
+  .btn-secondary:hover{
+    color: var(--color-warning);
+    border-color: color-mix(in srgb, var(--color-warning), transparent 50%);
+  }
+
   .btn-ghost {
     color: var(--color-text-muted);
     background: transparent;
     border: 1px solid color-mix(in srgb, var(--color-outline), transparent 50%);
+  }
+
+  .btn-ghost:hover{
+    color: var(--color-primary-500);
+    border-color: color-mix(in srgb, var(--color-primary-500), transparent 50%);
   }
 </style>
