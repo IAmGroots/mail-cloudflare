@@ -2,7 +2,6 @@ export interface DashboardMetricDto {
   key: string;
   label: string;
   value: string;
-  hint?: string;
   delta?: string;
   status?: 'ok' | 'warning' | 'critical';
   tone?: 'primary' | 'success' | 'warning' | 'danger' | 'neutral';

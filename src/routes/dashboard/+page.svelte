@@ -7,7 +7,6 @@
   import Button from '$lib/components/atoms/Button.svelte';
   import type { PageData } from './$types';
   import { page } from '$app/stores';
-  import { sidebarCollapsed } from '$lib/stores/ui.store';
   import { formatRelativeTime, getInitials } from '$lib/utils/format';
   import type {
     DashboardMetricDto,
@@ -118,7 +117,7 @@
 
 <div class="layout-shell">
   <AppSidebar active="dashboard" adminEmail={adminEmail} />
-  <section class="main" class:sidebar-collapsed={$sidebarCollapsed}>
+  <section class="main">
     <AppTopbar
       title="Dashboard"
       variant="minimal"
@@ -130,7 +129,6 @@
       <CardSurface className="hero">
         <div class="hero-grid">
           <div class="hero-text">
-            <p class="hero-eyebrow">MailFlare</p>
             <h2 class="hero-title">{greeting}, Admin</h2>
             <p class="hero-sub">
               Ringkasan operasional mailbox, user, dan worker. Data terakhir disinkron
@@ -179,9 +177,6 @@
               </div>
               <div class="kpi-value">{metric.value}</div>
               <div class="kpi-label">{metric.label}</div>
-              {#if metric.hint}
-                <div class="kpi-hint">{metric.hint}</div>
-              {/if}
               {#if metric.delta}
                 <div class="kpi-delta">{metric.delta}</div>
               {/if}
@@ -218,18 +213,21 @@
             </div>
           </div>
 
-          <div class="pipeline-bar" role="img" aria-label="Distribusi status email">
-            {#each pipelineSegments as segment (segment.key)}
-              <span
-                class="seg seg-{segment.tone}"
-                style:flex-grow={Math.max(segment.value, 0.0001)}
-                title="{segment.label}: {segment.value.toLocaleString('id-ID')}"
-              ></span>
-            {/each}
-            {#if pipelineSegments.length === 0}
+          {#if pipelineSegments.length === 0}
+            <div class="pipeline-bar pipeline-bar-empty">
               <span class="seg-empty">Belum ada data email</span>
-            {/if}
-          </div>
+            </div>
+          {:else}
+            <div class="pipeline-bar" role="img" aria-label="Distribusi status email">
+              {#each pipelineSegments as segment (segment.key)}
+                <span
+                  class="seg seg-{segment.tone}"
+                  style:flex-grow={Math.max(segment.value, 0.0001)}
+                  title="{segment.label}: {segment.value.toLocaleString('id-ID')}"
+                ></span>
+              {/each}
+            </div>
+          {/if}
 
           <div class="pipeline-legend">
             {#each pipelineSegments as segment (segment.key)}
@@ -359,7 +357,6 @@
                 <span class="health-value">{system.telegramUpdatesLast24h}</span>
               </div>
             </div>
-            <div class="insights-divider"></div>
             <div class="health-footer">
               <Icon name="cloud_done" size={18} />
               <span>Status diperbarui berkala oleh Cloudflare Worker.</span>
@@ -417,7 +414,7 @@
   }
 
   .content {
-    padding: var(--space-4) var(--space-3);
+    padding: var(--space-3);
     display: grid;
     gap: var(--space-4);
   }
@@ -437,13 +434,6 @@
   .hero-text {
     min-width: 0;
     flex: 1 1 18rem;
-  }
-
-  .hero-eyebrow {
-    margin: 0 0 0.4rem;
-    font-size: var(--font-size-label-sm);
-    font-weight: var(--weight-medium);
-    color: var(--color-text-muted);
   }
 
   .hero-title {
@@ -472,7 +462,9 @@
 
   .block {
     display: grid;
+    grid-template-rows: auto 1fr;
     gap: var(--space-2);
+    align-content: start;
   }
 
   .block-head {
@@ -481,6 +473,7 @@
     align-items: flex-end;
     gap: var(--space-2);
     flex-wrap: wrap;
+    min-height: 3rem;
   }
 
   .block-head h3 {
@@ -555,14 +548,9 @@
     margin-top: 0.15rem;
   }
 
-  .kpi-hint {
-    color: var(--color-text-muted);
-    font-size: var(--font-size-label-sm);
-    margin-top: 0.1rem;
-  }
-
   .kpi-delta {
-    margin-top: 0.3rem;
+    margin-top: auto;
+    padding-top: 0.3rem;
     color: var(--color-tertiary-text);
     font-size: var(--font-size-label-sm);
     font-weight: var(--weight-medium);
@@ -602,6 +590,12 @@
     overflow: hidden;
     margin-top: var(--space-3);
     background: var(--color-surface-low);
+  }
+
+  .pipeline-bar-empty {
+    height: auto;
+    min-height: 5rem;
+    overflow: visible;
   }
 
   .seg {
@@ -693,10 +687,15 @@
   .fill-warning { background: var(--color-warning); }
   .fill-primary { background: var(--color-tertiary); }
 
+  .block > :global(.surface-card) {
+    height: 100%;
+  }
+
   .two-col {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-3);
+    align-items: stretch;
   }
 
   .insights-grid {
@@ -730,7 +729,7 @@
   .insights-divider {
     height: 1px;
     background: var(--color-border);
-    margin: var(--space-3) 0;
+    margin: var(--space-2) 0;
   }
 
   .top-users-head {
@@ -845,10 +844,6 @@
     border-bottom: 1px solid var(--color-border);
   }
 
-  .health-row:last-child {
-    border-bottom: 0;
-  }
-
   .health-label {
     color: var(--color-text-muted);
     font-size: 0.85rem;
@@ -867,7 +862,6 @@
     color: var(--color-text-muted);
     font-size: var(--font-size-label-sm);
     padding-top: var(--space-2);
-    border-top: 1px solid var(--color-border);
   }
 
   .health-footer :global(svg) {

@@ -1,9 +1,15 @@
 import { writable } from 'svelte/store';
 
-const defaultSidebarCollapsed =
-  typeof window !== 'undefined' ? window.matchMedia('(max-width: 960px)').matches : false;
-
-export const sidebarCollapsed = writable(defaultSidebarCollapsed);
+// Sidebar selalu dalam keadaan expanded (tidak bisa di-collapse).
+// Store tetap disediakan sebagai read-only agar komponen lama tidak error.
+export const sidebarCollapsed = {
+  subscribe: (run: (value: boolean) => void) => {
+    run(false);
+    return () => {};
+  },
+  set: () => {},
+  update: () => {}
+};
 export const darkMode = writable(false);
 
 if (typeof window !== 'undefined') {

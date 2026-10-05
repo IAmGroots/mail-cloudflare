@@ -1,7 +1,6 @@
 <script lang="ts">
   import { afterNavigate, goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { sidebarCollapsed } from '$lib/stores/ui.store';
   import AppSidebar from '$lib/components/organisms/AppSidebar.svelte';
   import AppTopbar from '$lib/components/organisms/AppTopbar.svelte';
   import MailboxTopbar from '$lib/components/organisms/MailboxTopbar.svelte';
@@ -92,7 +91,7 @@
 {#if showChrome}
   <div class="layout-shell">
     <AppSidebar active="users" {adminEmail} />
-    <section class="main" class:sidebar-collapsed={$sidebarCollapsed}>
+    <section class="main">
       <AppTopbar title="Inbox" variant="minimal" showRefresh={false} showLogout={false} />
       <div class="content">
         <div class="inbox-head">

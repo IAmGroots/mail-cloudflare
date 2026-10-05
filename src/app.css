@@ -100,6 +100,18 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Sembunyikan scrollbar dari alur layout agar UI tidak bergeser
+     saat scrollbar muncul/hilang. Scroll tetap bisa lewat wheel,
+     trackpad, dan keyboard. */
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 body {
   margin: 0;
   font-family: var(--font-mono);
@@ -148,16 +160,14 @@ textarea {
   width: 100%;
   min-width: 0;
   padding-left: var(--size-sidebar-expanded);
-  transition: padding-left 200ms ease;
-}
-
-.layout-shell .main.sidebar-collapsed {
-  padding-left: var(--size-sidebar-collapsed);
 }
 
 @media (max-width: 960px) {
-  .layout-shell .main,
-  .layout-shell .main.sidebar-collapsed {
+  .layout-shell {
+    flex-direction: column;
+  }
+
+  .layout-shell .main {
     padding-left: 0;
   }
 }

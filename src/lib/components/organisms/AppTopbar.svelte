@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation';
-  import { sidebarCollapsed, darkMode } from '$lib/stores/ui.store';
+  import { darkMode } from '$lib/stores/ui.store';
   import SearchField from '$lib/components/molecules/SearchField.svelte';
   import Button from '$lib/components/atoms/Button.svelte';
   import Icon from '$lib/components/atoms/Icon.svelte';
@@ -55,9 +55,6 @@
 
 <header class="topbar" class:minimal={isMinimal}>
   <div class="left">
-    <button class="menu-toggle" type="button" aria-label={$sidebarCollapsed ? 'Buka sidebar' : 'Tutup sidebar'} on:click={() => sidebarCollapsed.update((value) => !value)}>
-      <Icon name={$sidebarCollapsed ? 'menu' : 'menu_open'} size={18} />
-    </button>
     {#if !isMinimal && breadcrumb}
       <div class="crumb">{breadcrumb}</div>
     {/if}
@@ -104,6 +101,7 @@
 
 <style>
   .topbar {
+    height: 64px;
     position: sticky;
     top: 0;
     z-index: 2;
@@ -111,14 +109,12 @@
     justify-content: space-between;
     align-items: center;
     gap: var(--space-3);
-    padding: 0.75rem 1.25rem;
     border-bottom: 1px solid var(--color-border);
     background: var(--color-surface-card);
   }
 
   .topbar.minimal {
-    padding: 0.5rem 1.25rem;
-    min-height: 2.75rem;
+    padding: var(--space-3);
   }
 
   .left {
@@ -153,26 +149,6 @@
 
   .search {
     width: min(28rem, 42vw);
-  }
-
-  .menu-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface-low);
-    border-radius: var(--radius-sm);
-    color: var(--color-text);
-    width: 44px;
-    height: 44px;
-    flex-shrink: 0;
-    cursor: pointer;
-    transition: color 120ms ease, border-color 120ms ease, background-color 120ms ease;
-  }
-
-  .menu-toggle:hover {
-    border-color: var(--color-tertiary-text);
-    color: var(--color-tertiary-text);
   }
 
   .icon-action {

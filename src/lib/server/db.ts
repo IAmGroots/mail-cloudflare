@@ -124,6 +124,8 @@ export async function getDashboardOverview(db?: D1Database): Promise<DashboardDt
     storageAgg,
     receivedTodayCount,
     received7dCount,
+    usersTodayCount,
+    unreadTodayCount,
     activeLoginSessions,
     activeApiKeys,
     pendingAccessCodes,
@@ -208,14 +210,29 @@ export async function getDashboardOverview(db?: D1Database): Promise<DashboardDt
       .prepare(
         `SELECT COUNT(*) AS count
          FROM emails
-         WHERE received_at >= datetime('now', 'start of day')`
+         WHERE datetime(received_at) >= datetime('now', 'start of day')`
       )
       .first<{ count: number }>(),
     db
       .prepare(
         `SELECT COUNT(*) AS count
          FROM emails
-         WHERE received_at >= datetime('now', '-7 days')`
+         WHERE datetime(received_at) >= datetime('now', '-7 days')`
+      )
+      .first<{ count: number }>(),
+    db
+      .prepare(
+        `SELECT COUNT(*) AS count
+         FROM users
+         WHERE datetime(created_at) >= datetime('now', 'start of day')`
+      )
+      .first<{ count: number }>(),
+    db
+      .prepare(
+        `SELECT COUNT(*) AS count
+         FROM emails
+         WHERE is_read = 0 AND deleted_at IS NULL
+           AND datetime(received_at) >= datetime('now', 'start of day')`
       )
       .first<{ count: number }>(),
     db
@@ -242,7 +259,7 @@ export async function getDashboardOverview(db?: D1Database): Promise<DashboardDt
       .prepare(
         `SELECT COUNT(*) AS count
          FROM emails
-         WHERE received_at >= datetime('now', '-1 hour')`
+         WHERE datetime(received_at) >= datetime('now', '-1 hour')`
       )
       .first<{ count: number }>(),
     db
@@ -287,7 +304,7 @@ export async function getDashboardOverview(db?: D1Database): Promise<DashboardDt
       key: 'users',
       label: 'Registered Users',
       value: formatNumber(usersTotal),
-      hint: `${formatNumber(telegramEnabled)} telegram aktif`,
+      delta: `+${formatNumber(usersTodayCount?.count ?? 0)} hari ini`,
       status: 'ok',
       tone: 'primary',
       icon: 'group'
@@ -296,7 +313,6 @@ export async function getDashboardOverview(db?: D1Database): Promise<DashboardDt
       key: 'emails',
       label: 'Email Records',
       value: formatNumber(totalEmails),
-      hint: `${formatNumber(received7dCount?.count ?? 0)} 7 hari terakhir`,
       delta: `+${formatNumber(receivedTodayCount?.count ?? 0)} hari ini`,
       status: 'ok',
       tone: 'primary',
@@ -306,7 +322,7 @@ export async function getDashboardOverview(db?: D1Database): Promise<DashboardDt
       key: 'unread',
       label: 'Unread Inbox Items',
       value: formatNumber(unreadCount),
-      hint: unreadCount > 0 ? 'Perlu ditinjau' : 'Semua sudah terbaca',
+      delta: `+${formatNumber(unreadTodayCount?.count ?? 0)} hari ini`,
       status: unreadCount > 0 ? 'warning' : 'ok',
       tone: 'warning',
       icon: 'mark_email_unread'
@@ -315,7 +331,6 @@ export async function getDashboardOverview(db?: D1Database): Promise<DashboardDt
       key: 'starred',
       label: 'Starred by Admin',
       value: formatNumber(starredCount),
-      hint: 'Disimpan permanen',
       status: 'ok',
       tone: 'success',
       icon: 'star'
@@ -324,7 +339,6 @@ export async function getDashboardOverview(db?: D1Database): Promise<DashboardDt
       key: 'archived',
       label: 'Archived',
       value: formatNumber(archivedCount),
-      hint: 'Dipindahkan dari inbox',
       status: 'ok',
       tone: 'neutral',
       icon: 'archive'
@@ -333,7 +347,6 @@ export async function getDashboardOverview(db?: D1Database): Promise<DashboardDt
       key: 'deleted',
       label: 'Soft Deleted',
       value: formatNumber(deletedCount),
-      hint: 'Dalam masa retensi',
       status: deletedCount > 0 ? 'critical' : 'ok',
       tone: 'danger',
       icon: 'delete'
@@ -1764,12 +1777,12 @@ export async function softDeleteUserInDb(db: D1Database | undefined, userId: str
 const dashboardOverviewFallback: DashboardDto = {
   generatedAt: new Date().toISOString(),
   metrics: [
-    { key: 'users', label: 'Registered Users', value: '2', hint: '2 telegram aktif', status: 'ok', tone: 'primary', icon: 'group' },
-    { key: 'emails', label: 'Email Records', value: '2', hint: '2 dalam 7 hari terakhir', delta: '+0 hari ini', status: 'ok', tone: 'primary', icon: 'mail' },
-    { key: 'unread', label: 'Unread Inbox Items', value: '2', hint: 'Perlu ditinjau', status: 'warning', tone: 'warning', icon: 'mark_email_unread' },
-    { key: 'starred', label: 'Starred by Admin', value: '1', hint: 'Disimpan permanen', status: 'ok', tone: 'success', icon: 'star' },
-    { key: 'archived', label: 'Archived', value: '1', hint: 'Dipindahkan dari inbox', status: 'ok', tone: 'neutral', icon: 'archive' },
-    { key: 'deleted', label: 'Soft Deleted', value: '0', hint: 'Dalam masa retensi', status: 'ok', tone: 'danger', icon: 'delete' }
+    { key: 'users', label: 'Registered Users', value: '2', delta: '+0 hari ini', status: 'ok', tone: 'primary', icon: 'group' },
+    { key: 'emails', label: 'Email Records', value: '2', delta: '+0 hari ini', status: 'ok', tone: 'primary', icon: 'mail' },
+    { key: 'unread', label: 'Unread Inbox Items', value: '2', delta: '+0 hari ini', status: 'warning', tone: 'warning', icon: 'mark_email_unread' },
+    { key: 'starred', label: 'Starred by Admin', value: '1', status: 'ok', tone: 'success', icon: 'star' },
+    { key: 'archived', label: 'Archived', value: '1', status: 'ok', tone: 'neutral', icon: 'archive' },
+    { key: 'deleted', label: 'Soft Deleted', value: '0', status: 'ok', tone: 'danger', icon: 'delete' }
   ],
   pipeline: {
     total: 2,

@@ -7,7 +7,6 @@
   import Checkbox from '$lib/components/atoms/Checkbox.svelte';
   import Button from '$lib/components/atoms/Button.svelte';
   import { page } from '$app/stores';
-  import { sidebarCollapsed } from '$lib/stores/ui.store';
   import { apiRequest } from '$lib/utils/api';
   import { tick } from 'svelte';
   import type { PageData } from './$types';
@@ -119,7 +118,7 @@
 
 <div class="layout-shell">
   <AppSidebar active="users" {adminEmail} />
-  <section class="main" class:sidebar-collapsed={$sidebarCollapsed}>
+  <section class="main">
     <AppTopbar title="Ubah user"
       variant="minimal"
       showRefresh={false}

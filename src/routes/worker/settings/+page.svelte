@@ -3,7 +3,6 @@
   import AppTopbar from '$lib/components/organisms/AppTopbar.svelte';
   import WorkerSettingsForm from '$lib/components/organisms/WorkerSettingsForm.svelte';
   import { page } from '$app/stores';
-  import { sidebarCollapsed } from '$lib/stores/ui.store';
   import type { PageData } from './$types';
 
   export let data: PageData;
@@ -12,7 +11,7 @@
 
 <div class="layout-shell">
   <AppSidebar active="worker" {adminEmail} />
-  <section class="main" class:sidebar-collapsed={$sidebarCollapsed}>
+  <section class="main">
     <AppTopbar title="Pengaturan worker"
       variant="minimal"
       showRefresh={false}
