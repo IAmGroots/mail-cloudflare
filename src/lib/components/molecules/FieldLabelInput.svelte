@@ -7,11 +7,14 @@
   export let readonly = false;
   export let type: 'text' | 'password' | 'email' | 'search' = 'text';
   export let id = '';
+  export let name = '';
+
+  const fieldId = id || `field-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
 <div class="field">
-  <label for={id}>{label}</label>
-  <InputText {id} bind:value {placeholder} {readonly} {type} />
+  <label for={fieldId}>{label}</label>
+  <InputText id={fieldId} {name} bind:value {placeholder} {readonly} {type} />
 </div>
 
 <style>
@@ -21,10 +24,8 @@
   }
 
   label {
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: var(--font-size-label-xs);
-    font-weight: 700;
+    color: var(--color-text);
+    font-size: var(--font-size-label-sm);
+    font-weight: var(--weight-medium);
   }
 </style>

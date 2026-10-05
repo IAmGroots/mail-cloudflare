@@ -9,7 +9,7 @@
   export let breadcrumb = '';
   export let showSearch = true;
   export let searchQuery = '';
-  export let searchPlaceholder = 'Search...';
+  export let searchPlaceholder = 'Cari...';
   export let searchLabel = 'Cari';
   export let onSearch: (() => void) | undefined = undefined;
   export let showRefresh = true;
@@ -55,7 +55,7 @@
 
 <header class="topbar" class:minimal={isMinimal}>
   <div class="left">
-    <button class="menu-toggle" type="button" aria-label={$sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} on:click={() => sidebarCollapsed.update((value) => !value)}>
+    <button class="menu-toggle" type="button" aria-label={$sidebarCollapsed ? 'Buka sidebar' : 'Tutup sidebar'} on:click={() => sidebarCollapsed.update((value) => !value)}>
       <Icon name={$sidebarCollapsed ? 'menu' : 'menu_open'} size={18} />
     </button>
     {#if !isMinimal && breadcrumb}
@@ -79,14 +79,14 @@
       {#if showRefresh}
         <Button variant="secondary" disabled={refreshing || loggingOut} on:click={handleRefresh}>
           <Icon name="refresh" size={18} />
-          {refreshing ? 'Refreshing...' : 'Refresh'}
+          {refreshing ? 'Memuat...' : 'Muat ulang'}
         </Button>
       {/if}
       {#if showThemeToggle}
         <button
           class="icon-action"
           type="button"
-          aria-label={$darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          aria-label={$darkMode ? 'Ganti ke mode terang' : 'Ganti ke mode gelap'}
           on:click={handleThemeToggle}
         >
           <Icon name={$darkMode ? 'light_mode' : 'dark_mode'} size={18} />
@@ -95,12 +95,9 @@
       {#if showLogout}
         <Button variant="ghost" disabled={loggingOut} on:click={handleLogout}>
           <Icon name="logout" size={18} />
-          {loggingOut ? 'Logging out...' : 'Logout'}
+          {loggingOut ? 'Keluar...' : 'Keluar'}
         </Button>
       {/if}
-    {/if}
-    {#if isMinimal}
-      <!-- theme toggle moved to sidebar bottom -->
     {/if}
   </div>
 </header>
@@ -113,15 +110,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--space-5);
-    padding: 0.9rem 1.4rem;
-    border-bottom: 1px solid color-mix(in srgb, var(--color-outline), transparent 60%);
-    background: color-mix(in srgb, var(--color-surface-card), transparent 12%);
-    backdrop-filter: blur(10px);
+    gap: var(--space-3);
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface-card);
   }
 
   .topbar.minimal {
-    padding: 0.5rem 1.4rem;
+    padding: 0.5rem 1.25rem;
     min-height: 2.75rem;
   }
 
@@ -133,29 +129,25 @@
   }
   .left h1 {
     font-size: 1rem;
-    margin-top: 0.2rem;
     line-height: 1.25;
     overflow-wrap: anywhere;
   }
 
   .minimal .left h1 {
-    margin-top: 0;
     font-size: 1.05rem;
-    font-weight: 700;
+    font-weight: var(--weight-bold);
   }
 
   .crumb {
     font-size: var(--font-size-label-sm);
     color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 700;
+    font-weight: var(--weight-medium);
   }
 
   .right {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-2);
     min-width: 0;
   }
 
@@ -167,28 +159,27 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid color-mix(in srgb, var(--color-outline), transparent 55%);
+    border: 1px solid var(--color-border);
     background: var(--color-surface-low);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     color: var(--color-text);
-    width: 2.1rem;
-    height: 2.1rem;
+    width: 44px;
+    height: 44px;
     flex-shrink: 0;
     cursor: pointer;
     transition: color 120ms ease, border-color 120ms ease, background-color 120ms ease;
   }
 
   .menu-toggle:hover {
-    color: var(--color-text);
-    border-color: color-mix(in srgb, var(--color-outline), transparent 28%);
-    background: color-mix(in srgb, var(--color-surface-low), transparent 10%);
+    border-color: var(--color-tertiary-text);
+    color: var(--color-tertiary-text);
   }
 
   .icon-action {
-    width: 2.45rem;
-    height: 2.45rem;
-    border-radius: var(--radius-md);
-    border: 1px solid color-mix(in srgb, var(--color-outline), transparent 50%);
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
     background: transparent;
     color: var(--color-text-muted);
     display: inline-flex;
@@ -199,9 +190,8 @@
   }
 
   .icon-action:hover {
-    color: var(--color-text);
-    border-color: color-mix(in srgb, var(--color-outline), transparent 28%);
-    background: color-mix(in srgb, var(--color-surface-low), transparent 10%);
+    color: var(--color-tertiary-text);
+    border-color: var(--color-tertiary-text);
   }
 
   @media (max-width: 960px) {

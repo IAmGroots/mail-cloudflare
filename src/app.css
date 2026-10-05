@@ -1,61 +1,97 @@
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/400-italic.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/ibm-plex-mono/600.css';
+@import '@fontsource/ibm-plex-mono/700.css';
+
+/*
+ * Design tokens follow DESIGN.md (OpenCode Mono Terminal).
+ * Near-flat: hierarchy comes from borders and tonal surfaces, never shadows.
+ * One accent (#007AFF) reserved for actions, links, and active states.
+ */
 :root {
-  --color-primary-500: #0051ff;
-  --color-primary-700: #003dc7;
-  --color-surface: #f7f9fb;
-  --color-surface-low: #f2f4f6;
+  --color-primary: #201d1d;
+  --color-secondary: #6b6767;
+  --color-tertiary: #007aff;
+  /* Text-safe accent: DESIGN.md's #007AFF is 4.02:1 on white (fails R-25 for
+     normal text). Accent text uses this darker step; borders, icons, and
+     non-text still use --color-tertiary. */
+  --color-tertiary-text: #0060cc;
+  --color-neutral: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-low: #f7f7f7;
   --color-surface-card: #ffffff;
-  --color-text: #191c1e;
-  --color-text-muted: #434656;
-  --color-outline: #c3c5d9;
-  --color-danger: #a00000;
-  --color-warning: #f31a1a;
-  --color-success: #1a7f37;
+  --color-on-surface: #201d1d;
+  --color-text: #201d1d;
+  --color-text-muted: #6b6767;
+  --color-border: #e5e7eb;
+  --color-outline: #e5e7eb;
+  --color-muted-border: #0f00001f;
+  --color-inverse-surface: #0b0b0b;
+  --color-inverse-text: #fdfcfd;
+  --color-success: #1a8f4c;
+  /* Text-safe success: #1A8F4C is 4.14:1 on white (fails R-25 for normal text). */
+  --color-success-text: #037a3e;
+  --color-error: #d92d20;
+  --color-danger: #d92d20;
+  --color-warning: #d92d20;
 
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-2_5: 0.625rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --space-8: 80px;
 
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 2rem;
-  --radius-pill: 9999px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
 
-  --font-family-body: 'Inter', sans-serif;
-  --font-family-headline: 'Manrope', sans-serif;
-  --font-size-label-xs: 0.625rem;
-  --font-size-label-sm: 0.6875rem;
-  --font-size-body-sm: 0.875rem;
-  --font-size-body-md: 1rem;
+  --font-mono: 'Berkeley Mono', 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
-  --shadow-ambient: 0 20px 48px rgba(0, 61, 199, 0.06);
-  --shadow-modal: 0 32px 64px rgba(0, 61, 199, 0.12);
-  --gradient-signature: linear-gradient(135deg, #003dc7 0%, #0051ff 100%);
+  --font-size-label-xs: 11px;
+  --font-size-label-sm: 12px;
+  --font-size-body-sm: 14px;
+  --font-size-body-md: 16px;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --focus-ring: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-tertiary);
+
   --size-sidebar-expanded: 16rem;
   --size-sidebar-collapsed: 3.5rem;
-  --mobile-nav-height: 5rem;
+  --mobile-nav-height: 4.25rem;
 }
 
 :root[data-theme='dark'] {
-  --color-primary-500: #427cff;
-  --color-primary-700: #6896ff;
-  --color-surface: #0e0f12;
-  --color-surface-low: #16181d;
-  --color-surface-card: #1c1e24;
-  --color-text: #ededef;
-  --color-text-muted: #b0b3be;
-  --color-outline: #3a3d4a;
-  --color-danger: #a00000;
-  --color-warning: #f31a1a;
-  --color-success: #7cd590;
-  
-  --shadow-ambient: 0 20px 48px rgba(0, 0, 0, 0.4);
-  --shadow-modal: 0 32px 64px rgba(0, 0, 0, 0.6);
+  --color-primary: #fdfcfd;
+  --color-secondary: #a8a5a5;
+  --color-tertiary: #4da3ff;
+  --color-tertiary-text: #4da3ff;
+  --color-neutral: #0b0b0b;
+  --color-surface: #0b0b0b;
+  --color-surface-low: #151515;
+  --color-surface-card: #111111;
+  --color-on-surface: #fdfcfd;
+  --color-text: #fdfcfd;
+  --color-text-muted: #a8a5a5;
+  --color-border: #2a2a2a;
+  --color-outline: #2a2a2a;
+  --color-muted-border: #ffffff1f;
+  --color-inverse-surface: #ffffff;
+  --color-inverse-text: #0b0b0b;
+  --color-success: #4ec27a;
+  --color-success-text: #4ec27a;
+  --color-error: #ff6b5e;
+  --color-danger: #ff6b5e;
+  --color-warning: #ff6b5e;
+
+  --focus-ring: 0 0 0 2px var(--color-surface), 0 0 0 4px var(--color-tertiary);
 }
 
 *,
@@ -66,10 +102,12 @@
 
 body {
   margin: 0;
-  font-family: var(--font-family-body);
+  font-family: var(--font-mono);
   font-size: var(--font-size-body-sm);
+  line-height: 1.5;
   color: var(--color-text);
   background: var(--color-surface);
+  -webkit-font-smoothing: antialiased;
 }
 
 h1,
@@ -77,27 +115,27 @@ h2,
 h3,
 h4 {
   margin: 0;
-  font-family: var(--font-family-headline);
+  font-family: var(--font-mono);
+  font-weight: var(--weight-bold);
 }
 
 a {
-  color: inherit;
+  color: var(--color-tertiary-text);
   text-decoration: none;
 }
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
-.material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
-  line-height: 1;
-  vertical-align: middle;
+:focus-visible {
+  outline: 2px solid var(--color-tertiary);
+  outline-offset: 2px;
 }
 
-/* ── Layout Shell ─────────────────────────────────────────────── */
 .layout-shell {
   min-height: 100dvh;
   position: relative;
@@ -124,14 +162,26 @@ select {
   }
 }
 
-/* ── Surface Card ─────────────────────────────────────────────── */
 .surface-card {
   background: var(--color-surface-card);
-  border: 1px solid color-mix(in srgb, var(--color-outline), transparent 72%);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-ambient);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }
 
 .surface-card.padded {
-  padding: var(--space-5);
+  padding: var(--space-2);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -11,12 +11,12 @@
 </script>
 
 <div class="layout-shell">
-  <AppSidebar active="worker" adminEmail={adminEmail} />
+  <AppSidebar active="worker" {adminEmail} />
   <section class="main" class:sidebar-collapsed={$sidebarCollapsed}>
-    <AppTopbar title="Worker Settings"
+    <AppTopbar title="Pengaturan worker"
       variant="minimal"
       showRefresh={false}
-      showLogout={false} breadcrumb="mailflare / worker / settings" showSearch={false} />
+      showLogout={false} breadcrumb="MailFlare / Worker / Pengaturan" showSearch={false} />
     <div class="content">
       <WorkerSettingsForm data={data.workerSettings} />
     </div>
@@ -25,12 +25,6 @@
 
 <style>
   .content {
-    padding: var(--space-5);
-  }
-
-  @media (max-width: 960px) {
-    .content {
-      padding: var(--space-4) var(--space-3);
-    }
+    padding: var(--space-3);
   }
 </style>

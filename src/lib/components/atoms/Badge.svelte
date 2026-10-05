@@ -10,35 +10,38 @@
     align-items: center;
     gap: 0.25rem;
     font-size: var(--font-size-label-xs);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    border-radius: var(--radius-pill);
-    padding: 0.2rem 0.55rem;
+    font-weight: var(--weight-medium);
+    border-radius: var(--radius-sm);
+    padding: 0.15rem 0.45rem;
   }
 
   .badge-neutral {
     color: var(--color-text-muted);
-    background: color-mix(in srgb, var(--color-outline), var(--color-surface-card) 75%);
+    background: var(--color-surface-low);
+    border: 1px solid var(--color-border);
   }
 
   .badge-primary {
-    color: var(--color-primary-500);
-    background: color-mix(in srgb, var(--color-primary-500), var(--color-surface-card) 90%);
+    color: var(--color-tertiary-text);
+    background: color-mix(in srgb, var(--color-tertiary), transparent 92%);
+    border: 1px solid color-mix(in srgb, var(--color-tertiary), transparent 70%);
   }
 
   .badge-success {
-    color: var(--color-success);
-    background: color-mix(in srgb, var(--color-success), var(--color-surface-card) 88%);
+    color: var(--color-success-text);
+    background: color-mix(in srgb, var(--color-success), transparent 92%);
+    border: 1px solid color-mix(in srgb, var(--color-success), transparent 70%);
   }
 
   .badge-warning {
     color: var(--color-warning);
-    background: color-mix(in srgb, var(--color-warning), var(--color-surface-card) 88%);
+    background: color-mix(in srgb, var(--color-warning), transparent 92%);
+    border: 1px solid color-mix(in srgb, var(--color-warning), transparent 70%);
   }
 
   .badge-danger {
     color: var(--color-danger);
-    background: color-mix(in srgb, var(--color-danger), var(--color-surface-card) 88%);
+    background: color-mix(in srgb, var(--color-danger), transparent 92%);
+    border: 1px solid color-mix(in srgb, var(--color-danger), transparent 70%);
   }
 </style>

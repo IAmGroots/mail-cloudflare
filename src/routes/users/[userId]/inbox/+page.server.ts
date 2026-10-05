@@ -27,7 +27,7 @@ export const load: PageServerLoad = async (event) => {
   ]);
 
   if (!currentUser) {
-    throw error(404, 'User not found');
+    throw error(404, 'User tidak ditemukan');
   }
 
   const emails = isSearching && searchMeta ? searchMeta.items : emailSource;

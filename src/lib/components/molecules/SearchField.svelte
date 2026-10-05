@@ -1,9 +1,10 @@
 <script lang="ts">
   import Icon from '$lib/components/atoms/Icon.svelte';
   export let value = '';
-  export let placeholder = 'Search...';
+  export let placeholder = 'Cari...';
   export let onSearch: (() => void) | undefined = undefined;
   export let searchLabel = 'Cari';
+  export let ariaLabel = 'Cari email';
 
   function handleKeydown(event: KeyboardEvent) {
     if (event.key === 'Enter' && onSearch) {
@@ -14,18 +15,19 @@
 </script>
 
 <label class="search">
-  <span class="icon"><Icon name="search" size={18} /></span>
+  <span class="icon" aria-hidden="true"><Icon name="search" size={18} /></span>
   <input
     bind:value
     {placeholder}
     type="search"
+    aria-label={ariaLabel}
     on:keydown={handleKeydown}
   />
   {#if onSearch}
     <button
       type="button"
       class="submit"
-      aria-label="Submit search"
+      aria-label={ariaLabel}
       on:click={onSearch}
     >
       {searchLabel}
@@ -51,18 +53,18 @@
 
   input {
     width: 100%;
-    border: 1px solid color-mix(in srgb, var(--color-outline), transparent 55%);
-    background: color-mix(in srgb, var(--color-surface-low), var(--color-surface-card) 40%);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-card);
     color: var(--color-text);
-    border-radius: var(--radius-pill);
-    padding: 0.62rem 0.95rem 0.62rem 2.4rem;
-    outline: none;
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 5rem 0.6rem 2.4rem;
+    min-height: 44px;
   }
 
-  input:focus {
-    border-color: color-mix(in srgb, var(--color-primary-500), var(--color-surface-card) 45%);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500), transparent 85%);
-    background: var(--color-surface-card);
+  input:focus-visible {
+    outline: none;
+    border-color: var(--color-tertiary-text);
+    box-shadow: var(--focus-ring);
   }
 
   .submit {
@@ -70,22 +72,20 @@
     right: 0.3rem;
     top: 50%;
     transform: translateY(-50%);
-    border: 0;
-    background: var(--gradient-signature);
-    color: #fff;
-    font-weight: 700;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-low);
+    color: var(--color-text);
+    font-weight: var(--weight-medium);
     font-size: 0.78rem;
     padding: 0.4rem 0.95rem;
-    border-radius: var(--radius-pill);
+    min-height: 34px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: opacity 120ms ease, transform 120ms ease;
+    transition: border-color 120ms ease, color 120ms ease;
   }
 
   .submit:hover {
-    opacity: 0.92;
-  }
-
-  .submit:active {
-    transform: translateY(-50%) scale(0.97);
+    border-color: var(--color-tertiary-text);
+    color: var(--color-tertiary-text);
   }
 </style>

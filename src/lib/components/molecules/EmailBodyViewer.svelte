@@ -4,7 +4,7 @@
   export let snippet = '';
 
   $: hasHtml = bodyHtml.trim().length > 0;
-  $: plainText = (bodyText || snippet || '(No Content)').trim();
+  $: plainText = (bodyText || snippet || '(Tidak ada konten)').trim();
   $: frameSrcDoc = buildFrameSrcDoc(bodyHtml);
 
   function buildFrameSrcDoc(rawHtml: string): string {
@@ -37,19 +37,19 @@
 <style>
   .email-frame {
     width: 100%;
-    min-height: 68vh;
-    border: 1px solid color-mix(in srgb, var(--color-outline), transparent 65%);
-    border-radius: var(--radius-md);
-    background: white;
+    min-height: 60vh;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: #ffffff;
   }
 
   pre {
     white-space: pre-wrap;
     line-height: 1.6;
     margin: 0;
-    border: 1px solid color-mix(in srgb, var(--color-outline), transparent 65%);
-    border-radius: var(--radius-md);
-    padding: var(--space-3);
-    background: color-mix(in srgb, var(--color-primary-500), white 97%);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2);
+    background: var(--color-surface-low);
   }
 </style>

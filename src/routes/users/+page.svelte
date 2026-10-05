@@ -31,10 +31,10 @@
 </script>
 
 <div class="layout-shell">
-  <AppSidebar active="users" adminEmail={adminEmail} />
+  <AppSidebar active="users" {adminEmail} />
   <section class="main" class:sidebar-collapsed={$sidebarCollapsed}>
     <AppTopbar
-      title="User List"
+      title="Daftar user"
       variant="minimal"
       showSearch={false}
       showRefresh={false}
@@ -48,12 +48,6 @@
 
 <style>
   .content {
-    padding: var(--space-5);
-  }
-
-  @media (max-width: 960px) {
-    .content {
-      padding: var(--space-4) var(--space-3);
-    }
+    padding: var(--space-3);
   }
 </style>

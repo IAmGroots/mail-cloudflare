@@ -1,7 +1,6 @@
 <script lang="ts">
   import AppSidebar from '$lib/components/organisms/AppSidebar.svelte';
   import AppTopbar from '$lib/components/organisms/AppTopbar.svelte';
-  import DashboardMetricsGrid from '$lib/components/organisms/DashboardMetricsGrid.svelte';
   import CardSurface from '$lib/components/atoms/CardSurface.svelte';
   import Badge from '$lib/components/atoms/Badge.svelte';
   import Icon from '$lib/components/atoms/Icon.svelte';
@@ -9,13 +8,10 @@
   import type { PageData } from './$types';
   import { page } from '$app/stores';
   import { sidebarCollapsed } from '$lib/stores/ui.store';
+  import { formatRelativeTime, getInitials } from '$lib/utils/format';
   import type {
-    DashboardActivityEntryDto,
     DashboardMetricDto,
     DashboardPipelineDto,
-    DashboardSystemHealthDto,
-    DashboardUserInsightsDto,
-    DashboardUserSummaryDto,
     DashboardWorkerStatus
   } from '$lib/types/dto';
 
@@ -38,47 +34,22 @@
   };
 
   const workerLabel: Record<DashboardWorkerStatus, string> = {
-    operational: 'Operational',
-    degraded: 'Degraded',
-    down: 'Down'
+    operational: 'Normal',
+    degraded: 'Menurun',
+    down: 'Mati'
+  };
+
+  const metricStatusLabel: Record<string, string> = {
+    ok: 'normal',
+    warning: 'perhatian',
+    critical: 'kritis'
   };
 
   function formatTimestamp(value: string): string {
-    if (!value) {
-      return 'baru saja';
-    }
+    if (!value) return 'baru saja';
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
-    return new Intl.DateTimeFormat('id-ID', {
-      dateStyle: 'medium',
-      timeStyle: 'short'
-    }).format(date);
-  }
-
-  function formatRelative(value: string): string {
-    if (!value) {
-      return 'baru saja';
-    }
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
-    const diff = Date.now() - date.getTime();
-    if (diff < 60_000) {
-      return 'baru saja';
-    }
-    if (diff < 3_600_000) {
-      const m = Math.floor(diff / 60_000);
-      return `${m} menit lalu`;
-    }
-    if (diff < 86_400_000) {
-      const h = Math.floor(diff / 3_600_000);
-      return `${h} jam lalu`;
-    }
-    const d = Math.floor(diff / 86_400_000);
-    return `${d} hari lalu`;
+    if (Number.isNaN(date.getTime())) return value;
+    return new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
   }
 
   function buildGreeting(): string {
@@ -87,13 +58,6 @@
     if (hour < 15) return 'Selamat siang';
     if (hour < 19) return 'Selamat sore';
     return 'Selamat malam';
-  }
-
-  function getInitials(name: string): string {
-    const parts = name.trim().split(/\s+/);
-    if (parts.length === 0) return '?';
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 
   function getMetricTone(metric: DashboardMetricDto): 'primary' | 'success' | 'warning' | 'danger' | 'neutral' {
@@ -109,11 +73,11 @@
 
   function buildPipelineSegments(p: DashboardPipelineDto) {
     const segments = [
-      { key: 'read', label: 'Read', value: p.read, tone: 'success' as const },
-      { key: 'unread', label: 'Unread', value: p.unread, tone: 'warning' as const },
-      { key: 'starred', label: 'Starred', value: p.starred, tone: 'primary' as const },
-      { key: 'archived', label: 'Archived', value: p.archived, tone: 'neutral' as const },
-      { key: 'deleted', label: 'Deleted', value: p.deleted, tone: 'danger' as const }
+      { key: 'read', label: 'Terbaca', value: p.read, tone: 'success' as const },
+      { key: 'unread', label: 'Belum dibaca', value: p.unread, tone: 'warning' as const },
+      { key: 'starred', label: 'Berbintang', value: p.starred, tone: 'primary' as const },
+      { key: 'archived', label: 'Diarsip', value: p.archived, tone: 'neutral' as const },
+      { key: 'deleted', label: 'Terhapus', value: p.deleted, tone: 'danger' as const }
     ];
     return segments.filter((seg) => seg.value > 0);
   }
@@ -166,21 +130,21 @@
       <CardSurface className="hero">
         <div class="hero-grid">
           <div class="hero-text">
-            <p class="hero-eyebrow">MailFlare Infrastructure</p>
+            <p class="hero-eyebrow">MailFlare</p>
             <h2 class="hero-title">{greeting}, Admin</h2>
             <p class="hero-sub">
-              Ringkasan operasional mailbox, user, dan worker. <br>
-              Data terakhir disinkron <strong>{generatedAtLabel}</strong>.
+              Ringkasan operasional mailbox, user, dan worker. Data terakhir disinkron
+              <strong> {generatedAtLabel}</strong>.
             </p>
           </div>
           <div class="hero-actions">
             <Button variant="secondary" href="/users">
               <Icon name="group" size={18} />
-              Kelola User
+              Kelola user
             </Button>
-            <Button variant="primary" href="/users/add">
+            <Button variant="primary" href="/users">
               <Icon name="person_add" size={18} />
-              Tambah User
+              Tambah user
             </Button>
           </div>
         </div>
@@ -189,16 +153,16 @@
       <section class="block">
         <header class="block-head">
           <div>
-            <h3>Key Metrics</h3>
-            <p class="block-sub">Snapshot angka utama lintas modul.</p>
+            <h3>Metrik utama</h3>
+            <p class="block-sub">Angka ringkas lintas modul.</p>
           </div>
           <Badge tone="primary">{metrics.length} indikator</Badge>
         </header>
         <div class="kpi-grid">
           {#each metrics as metric (metric.key)}
-            <CardSurface padded={true} className="kpi-card tone-{getMetricTone(metric)}">
+            <CardSurface padded={true} className="kpi-card">
               <div class="kpi-head">
-                <div class="kpi-icon">
+                <div class="kpi-icon tone-{getMetricTone(metric)}">
                   <Icon name={getMetricIcon(metric)} size={18} />
                 </div>
                 <Badge
@@ -210,7 +174,7 @@
                     ? 'success'
                     : 'neutral'}
                 >
-                  {metric.status ?? 'ok'}
+                  {metricStatusLabel[metric.status ?? 'ok'] ?? 'normal'}
                 </Badge>
               </div>
               <div class="kpi-value">{metric.value}</div>
@@ -229,8 +193,8 @@
       <section class="block">
         <header class="block-head">
           <div>
-            <h3>Email Pipeline</h3>
-            <p class="block-sub">Distribusi status email dan utilisasi penyimpanan.</p>
+            <h3>Pipeline email</h3>
+            <p class="block-sub">Distribusi status email dan penggunaan penyimpanan.</p>
           </div>
           <Badge tone="primary">{pipeline.total.toLocaleString('id-ID')} total</Badge>
         </header>
@@ -283,7 +247,7 @@
           <div class="pipeline-progress">
             <div class="progress-row">
               <div class="progress-meta">
-                <span>Unread ratio</span>
+                <span>Rasio belum dibaca</span>
                 <span>{unreadRatio(pipeline)}%</span>
               </div>
               <div class="progress-track">
@@ -292,7 +256,7 @@
             </div>
             <div class="progress-row">
               <div class="progress-meta">
-                <span>With attachments</span>
+                <span>Dengan lampiran</span>
                 <span>{attachmentRatio(pipeline)}%</span>
               </div>
               <div class="progress-track">
@@ -307,7 +271,7 @@
         <section class="block">
           <header class="block-head">
             <div>
-              <h3>User Insights</h3>
+              <h3>Ringkasan user</h3>
               <p class="block-sub">Komposisi user dan aktivitas tertinggi.</p>
             </div>
             <Badge tone="primary">{users.total} user</Badge>
@@ -325,7 +289,7 @@
             </div>
             <div class="insights-divider"></div>
             <div class="top-users-head">
-              <span>Top user aktif</span>
+              <span>User paling aktif</span>
               <a href="/users" class="see-all">Lihat semua</a>
             </div>
             {#if users.topActive.length === 0}
@@ -334,19 +298,19 @@
               <ul class="top-users">
                 {#each users.topActive as user (user.id)}
                   <li class="user-row">
-                    <span class="avatar">{getInitials(user.displayName)}</span>
+                    <span class="avatar" aria-hidden="true">{getInitials(user.displayName)}</span>
                     <div class="user-info">
                       <span class="user-name">{user.displayName}</span>
                       <span class="user-email">{user.email}</span>
                     </div>
                     <div class="user-badges">
                       {#if user.role === 'owner'}
-                        <Badge tone="primary">owner</Badge>
+                        <Badge tone="primary">pemilik</Badge>
                       {/if}
                       {#if user.telegramEnabled}
                         <Badge tone="success">telegram</Badge>
                       {:else}
-                        <Badge tone="neutral">off</Badge>
+                        <Badge tone="neutral">nonaktif</Badge>
                       {/if}
                     </div>
                     <div class="user-stats">
@@ -363,7 +327,7 @@
         <section class="block">
           <header class="block-head">
             <div>
-              <h3>System Health</h3>
+              <h3>Kesehatan sistem</h3>
               <p class="block-sub">Status worker, sesi login, dan kredensial aktif.</p>
             </div>
             <Badge tone={workerTone[system.worker]}>{workerLabel[system.worker]}</Badge>
@@ -379,7 +343,7 @@
                 <span class="health-value">{system.emailsLastHour}</span>
               </div>
               <div class="health-row">
-                <span class="health-label">Login session aktif</span>
+                <span class="health-label">Sesi login aktif</span>
                 <span class="health-value">{system.activeLoginSessions}</span>
               </div>
               <div class="health-row">
@@ -387,18 +351,18 @@
                 <span class="health-value">{system.activeApiKeys}</span>
               </div>
               <div class="health-row">
-                <span class="health-label">Access code menunggu</span>
+                <span class="health-label">Kode akses menunggu</span>
                 <span class="health-value">{system.pendingAccessCodes}</span>
               </div>
               <div class="health-row">
-                <span class="health-label">Telegram update (24 jam)</span>
+                <span class="health-label">Pembaruan Telegram (24 jam)</span>
                 <span class="health-value">{system.telegramUpdatesLast24h}</span>
               </div>
             </div>
             <div class="insights-divider"></div>
             <div class="health-footer">
               <Icon name="cloud_done" size={18} />
-              <span>Health dicek kontinu via Cloudflare Worker.</span>
+              <span>Status diperbarui berkala oleh Cloudflare Worker.</span>
             </div>
           </CardSurface>
         </section>
@@ -407,8 +371,8 @@
       <section class="block">
         <header class="block-head">
           <div>
-            <h3>Recent Activity</h3>
-            <p class="block-sub">5 aksi terakhir yang tercatat di audit log.</p>
+            <h3>Aktivitas terbaru</h3>
+            <p class="block-sub">5 aksi terakhir yang tercatat di log audit.</p>
           </div>
           <Badge tone="primary">{recentActivity.length} entri</Badge>
         </header>
@@ -427,14 +391,14 @@
                       <span class="activity-action">{entry.action || 'aksi'}</span>
                       {#if entry.fromState && entry.toState}
                         <span class="activity-states">
-                          {entry.fromState} <span class="arrow">→</span> {entry.toState}
+                          {entry.fromState} <span class="arrow">ke</span> {entry.toState}
                         </span>
                       {/if}
                     </div>
                     <div class="activity-meta">
                       <span>oleh {entry.actor}</span>
-                      <span>•</span>
-                      <span>{formatRelative(entry.createdAt)}</span>
+                      <span aria-hidden="true">•</span>
+                      <span>{formatRelativeTime(entry.createdAt)}</span>
                     </div>
                   </div>
                 </li>
@@ -453,31 +417,19 @@
   }
 
   .content {
-    padding: var(--space-6) var(--space-6) var(--space-6) var(--space-5);
+    padding: var(--space-4) var(--space-3);
     display: grid;
-    gap: var(--space-5);
+    gap: var(--space-4);
   }
 
   :global(.hero) {
-    background: linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--color-primary-500), var(--color-surface-card) 92%) 0%,
-        var(--color-surface-card) 100%
-      );
-  }
-
-  :global([data-theme='dark']) :global(.hero) {
-    background: linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--color-primary-700), var(--color-surface-card) 80%) 0%,
-        var(--color-surface-card) 100%
-      );
+    background: var(--color-surface-card);
   }
 
   .hero-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-5);
+    gap: var(--space-3);
     justify-content: space-between;
     align-items: center;
   }
@@ -490,14 +442,8 @@
   .hero-eyebrow {
     margin: 0 0 0.4rem;
     font-size: var(--font-size-label-sm);
-    font-weight: 700;
-    color: var(--color-primary-500);
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-  }
-
-  :global([data-theme='dark']) .hero-eyebrow {
-    color: var(--color-primary-700);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-muted);
   }
 
   .hero-title {
@@ -515,25 +461,25 @@
 
   .hero-sub strong {
     color: var(--color-text);
-    font-weight: 700;
+    font-weight: var(--weight-medium);
   }
 
   .hero-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
 
   .block {
     display: grid;
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
 
   .block-head {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    gap: var(--space-3);
+    gap: var(--space-2);
     flex-wrap: wrap;
   }
 
@@ -551,35 +497,15 @@
   .kpi-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-4);
+    gap: var(--space-2);
   }
 
   :global(.kpi-card) {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    position: relative;
-    overflow: hidden;
-    padding: var(--space-4) var(--space-4) var(--space-4) calc(var(--space-4) + 4px);
+    padding: var(--space-2);
   }
-
-  :global(.kpi-card)::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 4px;
-    background: var(--color-primary-500);
-    opacity: 0.85;
-    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-  }
-
-  :global(.kpi-card.tone-success)::before { background: var(--color-success); }
-  :global(.kpi-card.tone-warning)::before { background: var(--color-warning); }
-  :global(.kpi-card.tone-danger)::before { background: var(--color-danger); }
-  :global(.kpi-card.tone-neutral)::before { background: var(--color-outline); }
-  :global(.kpi-card.tone-primary)::before { background: var(--color-primary-500); }
 
   .kpi-head {
     display: flex;
@@ -589,42 +515,42 @@
   }
 
   .kpi-icon {
-    background: color-mix(in srgb, var(--color-primary-500), var(--color-surface-card) 90%);
-    color: var(--color-primary-500);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     width: 2rem;
     height: 2rem;
     display: grid;
     place-items: center;
+    color: var(--color-text-muted);
+    background: var(--color-surface-low);
   }
 
-  :global(.kpi-card.tone-success) .kpi-icon {
-    color: var(--color-success);
-    background: color-mix(in srgb, var(--color-success), var(--color-surface-card) 90%);
+  .kpi-icon.tone-success {
+    color: var(--color-success-text);
+    background: color-mix(in srgb, var(--color-success), transparent 90%);
   }
-  :global(.kpi-card.tone-warning) .kpi-icon {
+  .kpi-icon.tone-warning {
     color: var(--color-warning);
-    background: color-mix(in srgb, var(--color-warning), var(--color-surface-card) 90%);
+    background: color-mix(in srgb, var(--color-warning), transparent 90%);
   }
-  :global(.kpi-card.tone-danger) .kpi-icon {
+  .kpi-icon.tone-danger {
     color: var(--color-danger);
-    background: color-mix(in srgb, var(--color-danger), var(--color-surface-card) 90%);
+    background: color-mix(in srgb, var(--color-danger), transparent 90%);
   }
-  :global(.kpi-card.tone-neutral) .kpi-icon {
-    color: var(--color-text-muted);
-    background: color-mix(in srgb, var(--color-outline), var(--color-surface-card) 80%);
+  .kpi-icon.tone-primary {
+    color: var(--color-tertiary-text);
+    background: color-mix(in srgb, var(--color-tertiary), transparent 90%);
   }
 
   .kpi-value {
     font-size: 1.85rem;
-    font-family: var(--font-family-headline);
-    font-weight: 800;
+    font-family: var(--font-mono);
+    font-weight: var(--weight-bold);
     line-height: 1.1;
   }
 
   .kpi-label {
     color: var(--color-text);
-    font-weight: 600;
+    font-weight: var(--weight-medium);
     font-size: 0.85rem;
     margin-top: 0.15rem;
   }
@@ -637,21 +563,17 @@
 
   .kpi-delta {
     margin-top: 0.3rem;
-    color: var(--color-primary-500);
+    color: var(--color-tertiary-text);
     font-size: var(--font-size-label-sm);
-    font-weight: 700;
-  }
-
-  :global([data-theme='dark']) .kpi-delta {
-    color: var(--color-primary-700);
+    font-weight: var(--weight-medium);
   }
 
   .pipeline-summary {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-3);
-    padding-bottom: var(--space-4);
-    border-bottom: 1px solid color-mix(in srgb, var(--color-outline), transparent 70%);
+    gap: var(--space-2);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .pipeline-stat {
@@ -663,25 +585,23 @@
   .pipeline-stat-label {
     color: var(--color-text-muted);
     font-size: var(--font-size-label-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 700;
+    font-weight: var(--weight-medium);
   }
 
   .pipeline-stat-value {
-    font-family: var(--font-family-headline);
+    font-family: var(--font-mono);
     font-size: 1.4rem;
-    font-weight: 800;
+    font-weight: var(--weight-bold);
   }
 
   .pipeline-bar {
     display: flex;
     width: 100%;
     height: 0.7rem;
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-sm);
     overflow: hidden;
-    margin-top: var(--space-4);
-    background: color-mix(in srgb, var(--color-outline), var(--color-surface-card) 75%);
+    margin-top: var(--space-3);
+    background: var(--color-surface-low);
   }
 
   .seg {
@@ -691,8 +611,8 @@
 
   .seg-success { background: var(--color-success); }
   .seg-warning { background: var(--color-warning); }
-  .seg-primary { background: var(--color-primary-500); }
-  .seg-neutral { background: color-mix(in srgb, var(--color-outline), var(--color-text) 30%); }
+  .seg-primary { background: var(--color-tertiary); }
+  .seg-neutral { background: var(--color-text-muted); }
   .seg-danger { background: var(--color-danger); }
 
   .seg-empty {
@@ -706,9 +626,8 @@
   .pipeline-legend {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3) var(--space-5);
-    margin-top: var(--space-3);
-    justify-content: center;
+    gap: var(--space-2) var(--space-3);
+    margin-top: var(--space-2);
   }
 
   .legend-item {
@@ -719,26 +638,26 @@
   }
 
   .legend-dot {
-    width: 0.55rem;
-    height: 0.55rem;
-    border-radius: 50%;
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: var(--radius-sm);
     flex-shrink: 0;
   }
 
   .legend-success { background: var(--color-success); }
   .legend-warning { background: var(--color-warning); }
-  .legend-primary { background: var(--color-primary-500); }
-  .legend-neutral { background: color-mix(in srgb, var(--color-outline), var(--color-text) 30%); }
+  .legend-primary { background: var(--color-tertiary); }
+  .legend-neutral { background: var(--color-text-muted); }
   .legend-danger { background: var(--color-danger); }
 
   .legend-label { color: var(--color-text-muted); }
-  .legend-value { font-weight: 700; }
+  .legend-value { font-weight: var(--weight-medium); }
   .legend-pct { color: var(--color-text-muted); }
 
   .pipeline-progress {
     display: grid;
-    gap: var(--space-3);
-    margin-top: var(--space-4);
+    gap: var(--space-2);
+    margin-top: var(--space-3);
   }
 
   .progress-row {
@@ -755,13 +674,13 @@
 
   .progress-meta span:last-child {
     color: var(--color-text);
-    font-weight: 700;
+    font-weight: var(--weight-medium);
   }
 
   .progress-track {
     height: 0.4rem;
-    border-radius: var(--radius-pill);
-    background: color-mix(in srgb, var(--color-outline), var(--color-surface-card) 75%);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-low);
     overflow: hidden;
   }
 
@@ -772,70 +691,65 @@
   }
 
   .fill-warning { background: var(--color-warning); }
-  .fill-primary { background: var(--color-primary-500); }
+  .fill-primary { background: var(--color-tertiary); }
 
   .two-col {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-5);
+    gap: var(--space-3);
   }
 
   .insights-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
 
   .insight-stat {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
-    padding: var(--space-3);
-    background: color-mix(in srgb, var(--color-surface-low), transparent 30%);
-    border-radius: var(--radius-md);
-    border: 1px solid color-mix(in srgb, var(--color-outline), transparent 75%);
+    padding: var(--space-2);
+    background: var(--color-surface-low);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
   }
 
   .insight-label {
     font-size: var(--font-size-label-sm);
     color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-weight: 700;
+    font-weight: var(--weight-medium);
   }
 
   .insight-value {
-    font-family: var(--font-family-headline);
+    font-family: var(--font-mono);
     font-size: 1.6rem;
-    font-weight: 800;
+    font-weight: var(--weight-bold);
   }
 
   .insights-divider {
     height: 1px;
-    background: color-mix(in srgb, var(--color-outline), transparent 70%);
-    margin: var(--space-4) 0;
+    background: var(--color-border);
+    margin: var(--space-3) 0;
   }
 
   .top-users-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
   }
 
   .top-users-head span {
-    font-weight: 700;
+    font-weight: var(--weight-medium);
     color: var(--color-text);
   }
 
   .see-all {
     font-size: var(--font-size-label-sm);
-    color: var(--color-primary-500);
-    font-weight: 700;
-  }
-
-  :global([data-theme='dark']) .see-all {
-    color: var(--color-primary-700);
+    color: var(--color-tertiary-text);
+    font-weight: var(--weight-medium);
+    padding: 0.25rem;
   }
 
   .top-users {
@@ -843,42 +757,32 @@
     margin: 0;
     padding: 0;
     display: grid;
-    gap: var(--space-2);
+    gap: var(--space-1);
   }
 
   .user-row {
     display: grid;
     grid-template-columns: 2.25rem minmax(0, 1fr) auto auto;
-    gap: var(--space-3);
+    gap: var(--space-2);
     align-items: center;
     padding: 0.55rem 0.6rem;
-    border-radius: var(--radius-md);
-    background: color-mix(in srgb, var(--color-surface-low), transparent 40%);
-    border: 1px solid color-mix(in srgb, var(--color-outline), transparent 80%);
-    transition: background-color 120ms ease, border-color 120ms ease;
-  }
-
-  .user-row:hover {
-    background: color-mix(in srgb, var(--color-primary-500), var(--color-surface-card) 95%);
-    border-color: color-mix(in srgb, var(--color-primary-500), var(--color-surface-card) 80%);
-  }
-
-  :global([data-theme='dark']) .user-row:hover {
-    background: color-mix(in srgb, var(--color-primary-700), var(--color-surface-card) 90%);
-    border-color: color-mix(in srgb, var(--color-primary-700), var(--color-surface-card) 70%);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-low);
+    border: 1px solid var(--color-border);
   }
 
   .avatar {
     width: 2.25rem;
     height: 2.25rem;
-    border-radius: 50%;
-    background: var(--gradient-signature);
-    color: #fff;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
     display: grid;
     place-items: center;
-    font-weight: 800;
+    font-weight: var(--weight-semibold);
     font-size: 0.78rem;
-    font-family: var(--font-family-headline);
+    font-family: var(--font-mono);
     flex-shrink: 0;
   }
 
@@ -889,7 +793,7 @@
   }
 
   .user-name {
-    font-weight: 700;
+    font-weight: var(--weight-medium);
     color: var(--color-text);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -918,30 +822,27 @@
   }
 
   .user-stat-value {
-    font-family: var(--font-family-headline);
+    font-family: var(--font-mono);
     font-size: 1.1rem;
-    font-weight: 800;
+    font-weight: var(--weight-bold);
   }
 
   .user-stat-label {
     font-size: var(--font-size-label-xs);
     color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 700;
+    font-weight: var(--weight-medium);
   }
 
   .health-grid {
     display: grid;
-    gap: 0;
   }
 
   .health-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.6rem 0.4rem;
-    border-bottom: 1px solid color-mix(in srgb, var(--color-outline), transparent 78%);
+    padding: 0.6rem 0.2rem;
+    border-bottom: 1px solid var(--color-border);
   }
 
   .health-row:last-child {
@@ -954,9 +855,9 @@
   }
 
   .health-value {
-    font-family: var(--font-family-headline);
+    font-family: var(--font-mono);
     font-size: 1.1rem;
-    font-weight: 800;
+    font-weight: var(--weight-bold);
   }
 
   .health-footer {
@@ -965,12 +866,12 @@
     gap: 0.5rem;
     color: var(--color-text-muted);
     font-size: var(--font-size-label-sm);
-    padding-top: var(--space-3);
-    border-top: 1px solid color-mix(in srgb, var(--color-outline), transparent 78%);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--color-border);
   }
 
-  .health-footer :global(.icon) {
-    color: var(--color-success);
+  .health-footer :global(svg) {
+    color: var(--color-success-text);
   }
 
   .activity-list {
@@ -978,58 +879,52 @@
     margin: 0;
     padding: 0;
     display: grid;
-    gap: var(--space-2);
+    gap: var(--space-1);
   }
 
   .activity-row {
     display: grid;
     grid-template-columns: 2rem minmax(0, 1fr);
-    gap: var(--space-3);
+    gap: var(--space-2);
     align-items: flex-start;
-    padding: 0.55rem 0.4rem;
-    border-bottom: 1px solid color-mix(in srgb, var(--color-outline), transparent 78%);
-    transition: background-color 120ms ease;
+    padding: 0.55rem 0.2rem;
+    border-bottom: 1px solid var(--color-border);
   }
 
   .activity-row:last-child {
     border-bottom: 0;
   }
 
-  .activity-row:hover {
-    background: color-mix(in srgb, var(--color-surface-low), transparent 30%);
-    border-radius: var(--radius-md);
-  }
-
   .activity-icon {
     width: 2rem;
     height: 2rem;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     display: grid;
     place-items: center;
-    background: color-mix(in srgb, var(--color-primary-500), var(--color-surface-card) 90%);
-    color: var(--color-primary-500);
+    color: var(--color-text-muted);
+    background: var(--color-surface-low);
     flex-shrink: 0;
   }
 
   .activity-tone-success {
-    color: var(--color-success);
-    background: color-mix(in srgb, var(--color-success), var(--color-surface-card) 90%);
+    color: var(--color-success-text);
+    background: color-mix(in srgb, var(--color-success), transparent 90%);
   }
   .activity-tone-warning {
     color: var(--color-warning);
-    background: color-mix(in srgb, var(--color-warning), var(--color-surface-card) 90%);
+    background: color-mix(in srgb, var(--color-warning), transparent 90%);
   }
   .activity-tone-danger {
     color: var(--color-danger);
-    background: color-mix(in srgb, var(--color-danger), var(--color-surface-card) 90%);
+    background: color-mix(in srgb, var(--color-danger), transparent 90%);
   }
   .activity-tone-neutral {
     color: var(--color-text-muted);
-    background: color-mix(in srgb, var(--color-outline), var(--color-surface-card) 80%);
+    background: var(--color-surface-low);
   }
   .activity-tone-primary {
-    color: var(--color-primary-500);
-    background: color-mix(in srgb, var(--color-primary-500), var(--color-surface-card) 90%);
+    color: var(--color-tertiary-text);
+    background: color-mix(in srgb, var(--color-tertiary), transparent 90%);
   }
 
   .activity-info {
@@ -1047,7 +942,7 @@
   }
 
   .activity-action {
-    font-weight: 700;
+    font-weight: var(--weight-medium);
     text-transform: capitalize;
   }
 
@@ -1057,12 +952,8 @@
   }
 
   .activity-states .arrow {
-    color: var(--color-primary-500);
+    color: var(--color-text-muted);
     margin: 0 0.2rem;
-  }
-
-  :global([data-theme='dark']) .activity-states .arrow {
-    color: var(--color-primary-700);
   }
 
   .activity-meta {
@@ -1074,7 +965,7 @@
 
   .empty {
     margin: 0;
-    padding: var(--space-4) 0;
+    padding: var(--space-3) 0;
     text-align: center;
     color: var(--color-text-muted);
   }
@@ -1086,11 +977,6 @@
   }
 
   @media (max-width: 960px) {
-    .content {
-      padding: var(--space-4) var(--space-4) var(--space-4) var(--space-3);
-      gap: var(--space-4);
-    }
-
     .two-col {
       grid-template-columns: 1fr;
     }
@@ -1123,7 +1009,7 @@
   @media (max-width: 640px) {
     .kpi-grid {
       grid-template-columns: 1fr;
-      gap: var(--space-3);
+      gap: var(--space-2);
     }
 
     .kpi-value {

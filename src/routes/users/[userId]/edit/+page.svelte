@@ -8,6 +8,8 @@
   import Button from '$lib/components/atoms/Button.svelte';
   import { page } from '$app/stores';
   import { sidebarCollapsed } from '$lib/stores/ui.store';
+  import { apiRequest } from '$lib/utils/api';
+  import { tick } from 'svelte';
   import type { PageData } from './$types';
 
   export let data: PageData;
@@ -21,11 +23,11 @@
   let isSubmitting = false;
   let isDeleting = false;
   let errorMessage = '';
+  let confirmDeleteOpen = false;
+  let confirmDeleteButton: HTMLButtonElement | null = null;
 
   async function handleSave() {
-    if (isSubmitting || isDeleting) {
-      return;
-    }
+    if (isSubmitting || isDeleting) return;
 
     isSubmitting = true;
     errorMessage = '';
@@ -36,17 +38,15 @@
       return;
     }
     if (password && password !== confirmPassword) {
-      errorMessage = 'Konfirmasi password tidak sama.';
+      errorMessage = 'Konfirmasi password tidak cocok.';
       isSubmitting = false;
       return;
     }
 
     try {
-      const response = await fetch(`/api/users/${data.user.id}`, {
+      const result = await apiRequest<{ error?: string }>(`/api/users/${data.user.id}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
           displayName,
@@ -55,59 +55,62 @@
         })
       });
 
-      if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-        errorMessage = payload?.error ?? 'Failed to update user.';
+      if (!result.ok) {
+        errorMessage = result.data?.error ?? 'Gagal memperbarui user.';
         return;
       }
 
       await goto('/users');
     } catch {
-      errorMessage = 'Unable to reach server. Please try again.';
+      errorMessage = 'Tidak dapat menghubungi server. Coba lagi.';
     } finally {
       isSubmitting = false;
     }
   }
 
+  function askDelete() {
+    confirmDeleteOpen = true;
+    void tick().then(() => confirmDeleteButton?.focus());
+  }
+
+  function cancelDelete() {
+    confirmDeleteOpen = false;
+  }
+
+  function handleDialogKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      cancelDelete();
+    }
+  }
+
   async function handleDelete() {
-    if (isDeleting || isSubmitting) {
-      return;
-    }
+    if (isDeleting || isSubmitting) return;
 
-    if (!confirm(`Delete user ${data.user.email}? This action cannot be undone.`)) {
-      return;
-    }
-
+    confirmDeleteOpen = false;
     isDeleting = true;
     errorMessage = '';
 
     try {
-      const response = await fetch(`/api/users/${data.user.id}`, {
+      const result = await apiRequest<{
+        error?: string;
+        dependencies?: { emails?: number; loginSessions?: number };
+      }>(`/api/users/${data.user.id}`, {
         method: 'DELETE',
-        headers: {
-          'x-mailflare-confirm': 'delete-user'
-        }
+        headers: { 'x-mailflare-confirm': 'delete-user' }
       });
 
-      if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as
-          | {
-              error?: string;
-              dependencies?: { emails?: number; loginSessions?: number };
-            }
-          | null;
-
-        if (payload?.dependencies) {
-          errorMessage = `${payload.error ?? 'Delete blocked'} (emails: ${payload.dependencies.emails ?? 0}, sessions: ${payload.dependencies.loginSessions ?? 0})`;
+      if (!result.ok) {
+        if (result.data?.dependencies) {
+          errorMessage = `${result.data.error ?? 'Penghapusan diblokir'} (email: ${result.data.dependencies.emails ?? 0}, sesi: ${result.data.dependencies.loginSessions ?? 0})`;
         } else {
-          errorMessage = payload?.error ?? 'Failed to delete user.';
+          errorMessage = result.data?.error ?? 'Gagal menghapus user.';
         }
         return;
       }
 
       await goto('/users');
     } catch {
-      errorMessage = 'Unable to reach server. Please try again.';
+      errorMessage = 'Tidak dapat menghubungi server. Coba lagi.';
     } finally {
       isDeleting = false;
     }
@@ -115,23 +118,23 @@
 </script>
 
 <div class="layout-shell">
-  <AppSidebar active="users" adminEmail={adminEmail} />
+  <AppSidebar active="users" {adminEmail} />
   <section class="main" class:sidebar-collapsed={$sidebarCollapsed}>
-    <AppTopbar title="Edit User"
+    <AppTopbar title="Ubah user"
       variant="minimal"
       showRefresh={false}
-      showLogout={false} breadcrumb="mailflare / users / edit" showSearch={false} />
+      showLogout={false} breadcrumb="MailFlare / User / Ubah" showSearch={false} />
     <div class="content">
       <CardSurface>
         <div class="panel">
           <div>
-            <h2>Edit User</h2>
-            <p class="text-muted">Update user identity and email address.</p>
+            <h2>Ubah user</h2>
+            <p class="text-muted">Perbarui identitas dan alamat email user.</p>
           </div>
 
           <form class="form" on:submit|preventDefault={handleSave}>
             <div>
-              <label for="display-name">Display Name</label>
+              <label for="display-name">Nama tampilan</label>
               <InputText id="display-name" bind:value={displayName} required />
             </div>
 
@@ -140,30 +143,30 @@
               <InputText id="email" type="email" bind:value={email} required />
             </div>
             <div>
-              <label for="password">New Password (Optional)</label>
-              <InputText id="password" type="password" bind:value={password} placeholder="Kosongkan jika tidak diubah" />
+              <label for="password">Password baru (opsional)</label>
+              <InputText id="password" type="password" bind:value={password} autocomplete="new-password" placeholder="Kosongkan jika tidak diubah" />
             </div>
             <div>
-              <label for="confirm-password">Confirm New Password</label>
-              <InputText id="confirm-password" type="password" bind:value={confirmPassword} placeholder="Ulangi password baru" />
+              <label for="confirm-password">Konfirmasi password baru</label>
+              <InputText id="confirm-password" type="password" bind:value={confirmPassword} autocomplete="new-password" placeholder="Ulangi password baru" />
             </div>
 
-            <div>
+            <div class="inline-field">
               <Checkbox id="telegram-enabled" bind:checked={telegramEnabled} />
-              <label for="telegram-enabled" class="inline-label">Forward incoming emails to Telegram</label>
+              <label for="telegram-enabled" class="inline-label">Teruskan email masuk ke Telegram</label>
             </div>
 
             {#if errorMessage}
-              <p class="error">{errorMessage}</p>
+              <p class="error" role="alert">{errorMessage}</p>
             {/if}
 
             <div class="actions">
-              <Button href="/users" variant="ghost">Cancel</Button>
-              <Button type="button" variant="secondary" disabled={isDeleting || isSubmitting} on:click={handleDelete}>
-                {isDeleting ? 'Deleting...' : 'Delete'}
+              <Button href="/users" variant="ghost">Batal</Button>
+              <Button type="button" variant="secondary" disabled={isDeleting || isSubmitting} on:click={askDelete}>
+                {isDeleting ? 'Menghapus...' : 'Hapus'}
               </Button>
               <Button type="submit" disabled={isSubmitting || isDeleting}>
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                {isSubmitting ? 'Menyimpan...' : 'Simpan perubahan'}
               </Button>
             </div>
           </form>
@@ -173,19 +176,42 @@
   </section>
 </div>
 
+{#if confirmDeleteOpen}
+  <div class="dialog-backdrop" role="presentation" on:click={cancelDelete} on:keydown={handleDialogKeydown}>
+    <div
+      class="dialog"
+      role="alertdialog"
+      tabindex="-1"
+      aria-modal="true"
+      aria-labelledby="confirm-delete-user"
+      on:click|stopPropagation={() => {}}
+      on:keydown={handleDialogKeydown}
+    >
+      <h3 id="confirm-delete-user">Hapus user ini?</h3>
+      <p>{data.user.email} akan dihapus permanen beserta datanya. Tindakan ini tidak bisa dibatalkan.</p>
+      <div class="dialog-actions">
+        <Button variant="secondary" on:click={cancelDelete}>Batal</Button>
+        <button class="confirm-btn" type="button" bind:this={confirmDeleteButton} on:click={handleDelete}>
+          Ya, hapus
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
+
 <style>
   .main {
     min-width: 0;
   }
 
   .content {
-    padding: var(--space-5);
+    padding: var(--space-3);
   }
 
   .panel {
     display: grid;
-    gap: var(--space-5);
-    max-width: 42rem;
+    gap: var(--space-3);
+    max-width: 40rem;
   }
 
   h2 {
@@ -195,53 +221,104 @@
 
   .form {
     display: grid;
-    gap: var(--space-4);
+    gap: var(--space-2);
   }
 
   label {
     display: block;
     margin-bottom: 0.35rem;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-size: var(--font-size-label-xs);
-    font-weight: 700;
+    color: var(--color-text);
+    font-size: var(--font-size-label-sm);
+    font-weight: var(--weight-medium);
+  }
+
+  .inline-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
   }
 
   .inline-label {
     display: inline;
-    margin-left: 0.5rem;
-    text-transform: none;
-    letter-spacing: normal;
-    font-size: 0.9rem;
-    font-weight: 400;
-    color: var(--color-text);
+    margin-bottom: 0;
+    font-size: var(--font-size-body-sm);
+    font-weight: var(--weight-regular);
     cursor: pointer;
   }
 
   .actions {
     display: flex;
     justify-content: flex-end;
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
 
   .error {
-    color: #c1263c;
-    font-size: 0.85rem;
+    color: var(--color-error);
+    font-size: var(--font-size-body-sm);
+    margin: 0;
+  }
+
+  .dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    padding: var(--space-3);
+    background: color-mix(in srgb, var(--color-text), transparent 45%);
+  }
+
+  .dialog {
+    width: min(26rem, 100%);
+    background: var(--color-surface-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .dialog h3 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  .dialog p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-body-sm);
+  }
+
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    margin-top: var(--space-1);
+  }
+
+  .confirm-btn {
+    min-height: 44px;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--color-error);
+    border-radius: var(--radius-sm);
+    background: var(--color-error);
+    color: #ffffff;
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+  }
+
+  .confirm-btn:hover {
+    background: color-mix(in srgb, var(--color-error), #000000 12%);
   }
 
   @media (max-width: 960px) {
-    .content {
-      padding: var(--space-4) var(--space-3);
-    }
-
     .actions {
       flex-wrap: wrap;
-      justify-content: stretch;
     }
 
     .actions :global(.btn) {
-      flex: 1 1 100%;
+      flex: 1;
     }
   }
 </style>

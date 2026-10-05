@@ -8,8 +8,8 @@
 
 <style>
   .checkbox {
-    width: 1rem;
-    height: 1rem;
-    accent-color: var(--color-primary-500);
+    width: 1.15rem;
+    height: 1.15rem;
+    accent-color: var(--color-tertiary);
   }
 </style>

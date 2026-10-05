@@ -6,17 +6,29 @@
 
   export let data: LayoutData;
 
+  type NavItem = { key: string; href: string; label: string; icon: string };
+
+  const ownerNav: NavItem[] = [
+    { key: 'dashboard', href: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { key: 'users', href: '/users', label: 'User', icon: 'group' },
+    { key: 'worker', href: '/worker/settings', label: 'Worker', icon: 'settings_input_component' }
+  ];
+
+  const memberNav: NavItem[] = [
+    { key: 'inbox', href: '/me/inbox', label: 'Inbox', icon: 'inbox' }
+  ];
+
   $: pathname = $page.url.pathname;
   $: showAppNav = !pathname.startsWith('/auth') && !pathname.startsWith('/api');
-  $: showOwnerMobileNav = showAppNav && data.sessionRole === 'owner';
+  $: navItems = data.sessionRole === 'owner' ? ownerNav : memberNav;
 </script>
 
-<div class={`app-frame ${showOwnerMobileNav ? 'with-mobile-nav' : ''}`}>
+<div class={`app-frame ${showAppNav ? 'with-mobile-nav' : ''}`}>
   <slot />
 </div>
 
-{#if showOwnerMobileNav}
-  <MobileBottomNav />
+{#if showAppNav}
+  <MobileBottomNav items={navItems} />
 {/if}
 
 <style>

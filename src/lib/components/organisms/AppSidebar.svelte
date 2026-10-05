@@ -100,16 +100,16 @@
     </div>
   </div>
 
-  <nav class="nav">
+  <nav class="nav" aria-label="Navigasi utama">
     <SidebarNavItem href="/dashboard" icon="dashboard" label="Dashboard" active={active === 'dashboard'} compact={compact} />
-    <SidebarNavItem href="/users" icon="group" label="User List" active={active === 'users'} compact={compact} />
-    <SidebarNavItem href="/worker/settings" icon="settings_input_component" label="Worker Settings" active={active === 'worker'} compact={compact} />
+    <SidebarNavItem href="/users" icon="group" label="Daftar User" active={active === 'users'} compact={compact} />
+    <SidebarNavItem href="/worker/settings" icon="settings_input_component" label="Pengaturan Worker" active={active === 'worker'} compact={compact} />
   </nav>
 
   <div class="sidebar-footer">
     {#if adminEmail}
       <div class="admin-info" title={adminEmail}>
-        <span class="admin-avatar">{adminInitial}</span>
+        <span class="admin-avatar" aria-hidden="true">{adminInitial}</span>
         {#if !compact}
           <span class="admin-name">{adminName}</span>
         {/if}
@@ -120,27 +120,27 @@
       <button
         class="sidebar-action"
         type="button"
-        aria-label={compact ? 'Switch theme' : ($darkMode ? 'Light mode' : 'Dark mode')}
+        aria-label={compact ? 'Ganti tema' : ($darkMode ? 'Mode terang' : 'Mode gelap')}
         on:click={() => darkMode.update(v => !v)}
-        title={compact ? 'Switch theme' : ''}
+        title={compact ? 'Ganti tema' : ''}
       >
         <Icon name={$darkMode ? 'light_mode' : 'dark_mode'} size={18} />
         {#if !compact}
-          <span>{$darkMode ? 'Light Mode' : 'Dark Mode'}</span>
+          <span>{$darkMode ? 'Mode terang' : 'Mode gelap'}</span>
         {/if}
       </button>
 
       <button
         class="sidebar-action logout"
         type="button"
-        aria-label="Logout"
+        aria-label="Keluar"
         disabled={loggingOut}
         on:click={handleLogout}
-        title={compact ? 'Logout' : ''}
+        title={compact ? 'Keluar' : ''}
       >
         <Icon name="logout" size={18} />
         {#if !compact}
-          <span>{loggingOut ? 'Logging out...' : 'Logout'}</span>
+          <span>{loggingOut ? 'Keluar...' : 'Keluar'}</span>
         {/if}
       </button>
     </div>
@@ -152,8 +152,7 @@
     position: fixed;
     inset: 0;
     border: 0;
-    background: color-mix(in srgb, var(--color-text), transparent 88%);
-    backdrop-filter: blur(1px);
+    background: color-mix(in srgb, var(--color-text), transparent 75%);
     z-index: 8;
     display: none;
   }
@@ -166,8 +165,7 @@
     display: flex;
     flex-direction: column;
     background: var(--color-surface-card);
-    border-right: 1px solid color-mix(in srgb, var(--color-outline), transparent 68%);
-    box-shadow: 0 18px 46px rgba(0, 43, 140, 0.16);
+    border-right: 1px solid var(--color-border);
     z-index: 9;
     overflow: hidden;
     transition: width 200ms ease, transform 200ms ease, background-color 200ms ease;
@@ -175,16 +173,14 @@
 
   .sidebar.collapsed {
     width: 3.5rem !important;
-    box-shadow: none;
   }
 
-  /* Header: brand di kiri, trigger collapse di kanan (pola shadcn) */
   .sidebar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-2);
-    padding: var(--space-4) var(--space-4) var(--space-3);
+    padding: var(--space-3) var(--space-3) var(--space-2);
     min-height: 3.5rem;
   }
 
@@ -213,7 +209,7 @@
   }
 
   .sidebar-footer {
-    border-top: 1px solid color-mix(in srgb, var(--color-outline), transparent 70%);
+    border-top: 1px solid var(--color-border);
     padding: var(--space-3) var(--space-3) calc(var(--space-4) + env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
@@ -225,7 +221,7 @@
     align-items: center;
     gap: var(--space-3);
     padding: 0.45rem 0.5rem;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     min-height: 2.25rem;
   }
 
@@ -237,20 +233,21 @@
   .admin-avatar {
     width: 1.75rem;
     height: 1.75rem;
-    border-radius: 50%;
-    background: var(--gradient-signature);
-    color: #fff;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-low);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
     display: grid;
     place-items: center;
-    font-weight: 800;
+    font-weight: var(--weight-semibold);
     font-size: 0.7rem;
-    font-family: var(--font-family-headline);
+    font-family: var(--font-mono);
     flex-shrink: 0;
   }
 
   .admin-name {
     font-size: var(--font-size-body-sm);
-    font-weight: 600;
+    font-weight: var(--weight-medium);
     color: var(--color-text);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -268,7 +265,7 @@
     align-items: center;
     gap: var(--space-3);
     padding: 0.5rem 0.6rem;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     border: none;
     background: transparent;
     color: var(--color-text-muted);
@@ -278,7 +275,7 @@
     transition: color 120ms ease, background-color 120ms ease;
     width: 100%;
     text-align: left;
-    min-height: 2.25rem;
+    min-height: 44px;
   }
 
   .sidebar.collapsed .sidebar-action {
@@ -288,7 +285,7 @@
 
   .sidebar-action:hover {
     color: var(--color-text);
-    background: color-mix(in srgb, var(--color-surface-low), transparent 20%);
+    background: var(--color-surface-low);
   }
 
   .sidebar-action.logout {
@@ -296,7 +293,7 @@
   }
 
   .sidebar-action.logout:hover {
-    background: color-mix(in srgb, var(--color-danger), var(--color-surface-card) 92%);
+    background: color-mix(in srgb, var(--color-danger), transparent 90%);
   }
 
   @media (max-width: 960px) {

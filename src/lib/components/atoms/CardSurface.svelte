@@ -9,12 +9,12 @@
 
 <style>
   .padded {
-    padding: var(--space-6);
+    padding: var(--space-2);
   }
 
   @media (max-width: 960px) {
     .padded {
-      padding: var(--space-4);
+      padding: var(--space-2);
     }
   }
 </style>

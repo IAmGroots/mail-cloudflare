@@ -22,16 +22,13 @@
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    border: 0;
-    border-radius: var(--radius-md);
-    padding: 0.75rem 1rem;
+    min-height: 44px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 1rem;
     cursor: pointer;
-    font-weight: 700;
-    transition: transform 120ms ease, opacity 120ms ease, background-color 120ms ease;
-  }
-
-  .btn:active {
-    transform: scale(0.98);
+    font-weight: var(--weight-medium);
+    transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
   }
 
   .btn:disabled {
@@ -44,28 +41,34 @@
   }
 
   .btn-primary {
-    color: #ffffff;
-    background: var(--gradient-signature);
+    color: var(--color-inverse-text);
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-primary), var(--color-tertiary) 12%);
   }
 
   .btn-secondary {
     color: var(--color-text);
-    background: var(--color-surface-low);
+    background: var(--color-surface-card);
+    border-color: var(--color-border);
   }
 
-  .btn-secondary:hover{
-    color: var(--color-warning);
-    border-color: color-mix(in srgb, var(--color-warning), transparent 50%);
+  .btn-secondary:hover:not(:disabled) {
+    border-color: var(--color-tertiary-text);
+    color: var(--color-tertiary-text);
   }
 
   .btn-ghost {
     color: var(--color-text-muted);
     background: transparent;
-    border: 1px solid color-mix(in srgb, var(--color-outline), transparent 50%);
+    border-color: transparent;
   }
 
-  .btn-ghost:hover{
-    color: var(--color-primary-500);
-    border-color: color-mix(in srgb, var(--color-primary-500), transparent 50%);
+  .btn-ghost:hover:not(:disabled) {
+    color: var(--color-text);
+    background: var(--color-surface-low);
   }
 </style>

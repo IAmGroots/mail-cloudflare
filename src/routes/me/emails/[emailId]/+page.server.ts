@@ -17,7 +17,7 @@ export const load: PageServerLoad = async (event) => {
     getUserEmailById(event, userId, event.params.emailId)
   ]);
   if (!email) {
-    throw error(404, 'Email not found');
+    throw error(404, 'Email tidak ditemukan');
   }
 
   return {

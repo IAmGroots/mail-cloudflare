@@ -6,6 +6,7 @@
   export let readonly = false;
   export let name = '';
   export let required = false;
+  export let autocomplete: AutoFill | undefined = undefined;
 </script>
 
 <input
@@ -17,22 +18,23 @@
   {placeholder}
   {readonly}
   {required}
+  {autocomplete}
 />
 
 <style>
   .input {
     width: 100%;
-    border: 1px solid color-mix(in srgb, var(--color-outline), transparent 55%);
-    background: color-mix(in srgb, var(--color-surface-low), var(--color-surface-card) 40%);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-card);
     color: var(--color-text);
-    padding: 0.75rem 0.875rem;
-    border-radius: var(--radius-md);
-    outline: none;
+    padding: 0.6rem 0.75rem;
+    min-height: 44px;
+    border-radius: var(--radius-sm);
   }
 
-  .input:focus {
-    border-color: color-mix(in srgb, var(--color-primary-500), var(--color-surface-card) 45%);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500), transparent 85%);
-    background: var(--color-surface-card);
+  .input:focus-visible {
+    outline: none;
+    border-color: var(--color-tertiary);
+    box-shadow: var(--focus-ring);
   }
 </style>

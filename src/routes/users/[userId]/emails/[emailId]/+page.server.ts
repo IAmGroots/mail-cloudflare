@@ -13,7 +13,7 @@ export const load: PageServerLoad = async (event) => {
 
   const [currentUser, email] = await Promise.all([getUserById(event, userId), getUserEmailById(event, userId, emailId)]);
   if (!email) {
-    throw error(404, 'Email not found');
+    throw error(404, 'Email tidak ditemukan');
   }
 
   return {

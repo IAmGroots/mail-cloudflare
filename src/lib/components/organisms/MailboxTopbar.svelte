@@ -6,7 +6,7 @@
 
   export let userLabel = '';
   export let searchQuery = '';
-  export let searchPlaceholder = 'Search emails...';
+  export let searchPlaceholder = 'Cari email...';
   export let searchLabel = 'Cari';
   export let onSearch: (() => void) | undefined = undefined;
   export let showSearch = true;
@@ -51,8 +51,8 @@
 <header class="topbar">
   <div class="inner">
     <div class="left">
-      <a class="brand" href="/me/inbox" aria-label="Go to inbox">
-        <span class="brand-icon"><Icon name="cloud" size={18} /></span>
+      <a class="brand" href="/me/inbox" aria-label="Ke inbox">
+        <span class="brand-icon" aria-hidden="true"><Icon name="cloud" size={18} /></span>
         <span class="brand-name">MailFlare</span>
       </a>
       {#if showSearch}
@@ -69,7 +69,7 @@
 
     <div class="right">
       {#if showRefresh}
-        <button class="icon-btn" type="button" aria-label="Refresh inbox" on:click={handleRefresh} disabled={refreshing || loggingOut}>
+        <button class="icon-btn" type="button" aria-label="Muat ulang inbox" on:click={handleRefresh} disabled={refreshing || loggingOut}>
           <Icon name="refresh" size={18} />
         </button>
       {/if}
@@ -79,7 +79,7 @@
       <button
         class="icon-btn"
         type="button"
-        aria-label={$darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+        aria-label={$darkMode ? 'Ganti ke mode terang' : 'Ganti ke mode gelap'}
         on:click={handleThemeToggle}
       >
         <Icon name={$darkMode ? 'light_mode' : 'dark_mode'} size={18} />
@@ -91,7 +91,7 @@
           <span class="user">{userLabel}</span>
         {/if}
         <button class="logout" type="button" disabled={loggingOut} on:click={handleLogout}>
-          <span>{loggingOut ? 'Logging out...' : 'Logout'}</span>
+          <span>{loggingOut ? 'Keluar...' : 'Keluar'}</span>
           <Icon name="logout" size={18} />
         </button>
       {/if}
@@ -104,10 +104,8 @@
     position: sticky;
     top: 0;
     z-index: 20;
-    background: color-mix(in srgb, var(--color-surface-card), transparent 18%);
-    border-bottom: 1px solid color-mix(in srgb, var(--color-outline), transparent 78%);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 20px 48px rgba(0, 61, 199, 0.06);
+    background: var(--color-surface-card);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .inner {
@@ -115,7 +113,7 @@
     margin: 0 auto;
     padding: 0.75rem 1.25rem;
     display: flex;
-    gap: var(--space-4);
+    gap: var(--space-3);
     justify-content: space-between;
     align-items: center;
   }
@@ -125,7 +123,7 @@
     min-width: 0;
     display: flex;
     align-items: center;
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
 
   .brand {
@@ -138,20 +136,19 @@
   .brand-icon {
     width: 1.9rem;
     height: 1.9rem;
-    border-radius: 0.55rem;
+    border-radius: var(--radius-sm);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
-    background: var(--color-primary-500);
+    color: var(--color-inverse-text);
+    background: var(--color-primary);
   }
 
   .brand-name {
-    font-family: var(--font-family-headline);
-    color: var(--color-primary-500);
-    font-size: 1.1rem;
-    font-weight: 800;
-    letter-spacing: -0.01em;
+    font-family: var(--font-mono);
+    color: var(--color-text);
+    font-size: 1rem;
+    font-weight: var(--weight-semibold);
   }
 
   .search {
@@ -161,17 +158,17 @@
   .right {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-2);
     flex-wrap: nowrap;
     justify-content: flex-end;
     min-width: 0;
   }
 
   .icon-btn {
-    width: 2.2rem;
-    height: 2.2rem;
-    border-radius: var(--radius-md);
-    border: 1px solid color-mix(in srgb, var(--color-outline), transparent 55%);
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
     background: transparent;
     color: var(--color-text-muted);
     display: inline-flex;
@@ -181,20 +178,20 @@
   }
 
   .icon-btn:hover {
-    color: var(--color-text);
-    background: color-mix(in srgb, var(--color-surface-low), transparent 8%);
+    color: var(--color-tertiary-text);
+    border-color: var(--color-tertiary-text);
   }
 
   .divider {
     width: 1px;
     height: 1.8rem;
-    background: color-mix(in srgb, var(--color-outline), transparent 70%);
+    background: var(--color-border);
   }
 
   .user {
-    font-family: var(--font-family-headline);
+    font-family: var(--font-mono);
     font-size: 0.82rem;
-    font-weight: 700;
+    font-weight: var(--weight-medium);
     color: var(--color-text);
   }
 
@@ -206,10 +203,10 @@
     align-items: center;
     gap: 0.35rem;
     cursor: pointer;
-    font-size: 0.72rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-size: var(--font-size-label-sm);
+    font-weight: var(--weight-medium);
+    min-height: 44px;
+    padding: 0 0.4rem;
   }
 
   .logout:hover {
@@ -220,6 +217,7 @@
     .inner {
       padding: 0.65rem 0.85rem;
       flex-wrap: wrap;
+      gap: var(--space-2);
     }
 
     .left {
@@ -233,9 +231,7 @@
     .right {
       width: 100%;
       justify-content: flex-start;
-      overflow-x: auto;
-      padding-bottom: 0.1rem;
-      scrollbar-width: thin;
+      flex-wrap: wrap;
     }
 
     .right :global(.btn),

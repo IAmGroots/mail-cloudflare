@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="MailFlare">
+  <rect width="32" height="32" rx="6" fill="#201D1D" />
+  <path d="M7 11.5A1.5 1.5 0 0 1 8.5 10h15a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 7 20.5z" fill="none" stroke="#FDFCFD" stroke-width="1.6" stroke-linejoin="round" />
+  <path d="m8 11 8 6 8-6" fill="none" stroke="#FDFCFD" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="24.5" cy="9.5" r="3" fill="#007AFF" />
+</svg>
